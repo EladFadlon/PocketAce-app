@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Phone, User as UserIcon } from 'lucide-react';
+import { Phone, User as UserIcon } from 'lucide-react';
 import { sendVerificationCode, verifyCodeAndRegister } from '../utils/auth';
 import type { User } from '../types';
 import '../styles/auth.css';
@@ -97,214 +97,117 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
     setCodeError('');
   };
 
-  /* ── Verification step ── */
-  if (step === 'verification') {
-    return (
-      <div className="auth-screen">
-        <div className="auth-bg" />
-        <motion.div
-          className="auth-card"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Logo */}
-          <div className="auth-logo">
-            <motion.div
-              className="auth-logo-icon"
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 120, delay: 0.1 }}
-            >
-              <Zap size={44} />
-            </motion.div>
-            <h1>Pocket Ace</h1>
-          </div>
+  // retained for potential future use
+  void switchTab;
+  void handleBackToPhone;
 
-          <div className="auth-verify-header">
-            <h2>📱 אימות מספר טלפון</h2>
-            <p>
-              קוד אימות נשלח אל <strong>{phone}</strong>.<br />
-              הקוד תקף ל-5 דקות.
-            </p>
-          </div>
-
-          <form onSubmit={handleVerificationSubmit} className="auth-form-body">
-            <div className="auth-field">
-              <label htmlFor="otp">קוד אימות (6 ספרות)</label>
-              <input
-                id="otp"
-                className="auth-otp-input"
-                type="text"
-                inputMode="numeric"
-                value={verificationCode}
-                onChange={e => {
-                  setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6));
-                  setCodeError('');
-                }}
-                placeholder="000000"
-                disabled={verificationLoading}
-                maxLength={6}
-                autoFocus
-                autoComplete="one-time-code"
-              />
-            </div>
-
-            <AnimatePresence>
-              {codeError && (
-                <motion.div
-                  className="auth-error"
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                >
-                  {codeError}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <motion.button
-              type="submit"
-              className="btn-auth-submit"
-              disabled={verificationLoading || verificationCode.length !== 6}
-              whileTap={{ scale: 0.97 }}
-            >
-              {verificationLoading ? '⏳ מאמת...' : 'אימות וכניסה ✓'}
-            </motion.button>
-
-            <motion.button
-              type="button"
-              className="btn-auth-back"
-              onClick={handleBackToPhone}
-              whileTap={{ scale: 0.97 }}
-            >
-              חזור לשינוי מספר
-            </motion.button>
-          </form>
-        </motion.div>
-      </div>
-    );
-  }
-
-  /* ── Initial step ── */
   return (
     <div className="auth-screen">
-      <div className="auth-bg" />
-      <motion.div
-        className="auth-card"
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Logo */}
-        <div className="auth-logo">
-          <motion.div
-            className="auth-logo-icon"
-            initial={{ scale: 0.7, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 120, delay: 0.1 }}
-          >
-            <Zap size={44} />
-          </motion.div>
-          <h1>Pocket Ace</h1>
-          <p className="auth-tagline">ניהול משחקי פוקר בכיס</p>
-        </div>
+      <div className="auth-bg-glow" />
+      <div className="auth-inner">
+        <AnimatePresence mode="wait">
+          {step === 'initial' ? (
+            <motion.div
+              key="initial"
+              style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <div className="auth-logo-card">♠</div>
+              <h1 className="auth-app-name">Pocket Ace</h1>
+              <p className="auth-tagline">תן לקלפים לדבר בשבילך ♠</p>
 
-        {/* Tab switcher */}
-        <div className="auth-tabs">
-          <motion.button
-            type="button"
-            className={`auth-tab${isLogin ? ' auth-tab--active' : ''}`}
-            onClick={() => switchTab(true)}
-            whileTap={{ scale: 0.97 }}
-          >
-            כניסה
-          </motion.button>
-          <motion.button
-            type="button"
-            className={`auth-tab${!isLogin ? ' auth-tab--active' : ''}`}
-            onClick={() => switchTab(false)}
-            whileTap={{ scale: 0.97 }}
-          >
-            הרשמה
-          </motion.button>
-        </div>
+              <div className="auth-tab-switcher">
+                <button
+                  className={`auth-tab ${isLogin ? 'active' : ''}`}
+                  onClick={() => { setIsLogin(true); setError(''); }}
+                >כניסה</button>
+                <button
+                  className={`auth-tab ${!isLogin ? 'active' : ''}`}
+                  onClick={() => { setIsLogin(false); setError(''); }}
+                >הרשמה</button>
+              </div>
 
-        {/* Form */}
-        <form onSubmit={handleInitialSubmit} className="auth-form-body">
-          <AnimatePresence>
-            {!isLogin && (
-              <motion.div
-                className="auth-field"
-                key="name-field"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <label htmlFor="name">
-                  <UserIcon size={14} />
-                  שם מלא
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={e => { setName(e.target.value); setError(''); }}
-                  placeholder="ישראל ישראלי"
-                  disabled={loading}
-                  autoFocus={!isLogin}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+              <form className="auth-inputs" onSubmit={handleInitialSubmit} style={{ width: '100%' }}>
+                {!isLogin && (
+                  <div className="auth-input-row">
+                    <span className="auth-input-icon"><UserIcon size={15} /></span>
+                    <input
+                      type="text"
+                      placeholder="שם מלא"
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      autoComplete="name"
+                    />
+                  </div>
+                )}
+                <div className="auth-input-row">
+                  <span className="auth-input-icon"><Phone size={15} /></span>
+                  <input
+                    type="tel"
+                    placeholder="מספר פלאפון"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    autoComplete="tel"
+                    dir="ltr"
+                  />
+                </div>
 
-          <div className="auth-field">
-            <label htmlFor="phone">
-              <Phone size={14} />
-              מספר טלפון
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              inputMode="tel"
-              value={phone}
-              onChange={e => { setPhone(e.target.value); setError(''); }}
-              placeholder="050-000-0000"
-              disabled={loading}
-              autoFocus={isLogin}
-              autoComplete="tel"
-              dir="ltr"
-            />
-          </div>
+                {error && <p className="auth-error">{error}</p>}
 
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                className="auth-error"
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-              >
-                {error}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <button className="auth-cta" type="submit" disabled={loading}>
+                  {loading ? '...' : 'בוא נשחק 🤙'}
+                </button>
+              </form>
 
-          <motion.button
-            type="submit"
-            className="btn-auth-submit"
-            disabled={loading || (!isLogin && !name.trim()) || !phone.trim()}
-            whileTap={{ scale: 0.97 }}
-          >
-            {loading
-              ? '⏳ רגע...'
-              : isLogin
-                ? 'שלח קוד כניסה →'
-                : 'שלח קוד אימות →'}
-          </motion.button>
-        </form>
-      </motion.div>
+              <div className="auth-divider">
+                {isLogin
+                  ? <><span onClick={() => setIsLogin(false)}>פתח חשבון — זה שניה</span></>
+                  : <><span onClick={() => setIsLogin(true)}>כבר יש לך חשבון? כנסו</span></>
+                }
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="verify"
+              style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <div className="auth-logo-card">🔑</div>
+              <h2 className="auth-verify-title">קוד אימות נשלח</h2>
+              <p className="auth-verify-sub">הזן את הקוד שקיבלת למספר {phone}</p>
+
+              <form className="auth-inputs" onSubmit={handleVerificationSubmit} style={{ width: '100%' }}>
+                <div className="auth-input-row">
+                  <span className="auth-input-icon">💬</span>
+                  <input
+                    type="text"
+                    placeholder="קוד אימות"
+                    value={verificationCode}
+                    onChange={e => setVerificationCode(e.target.value)}
+                    dir="ltr"
+                    inputMode="numeric"
+                    maxLength={6}
+                  />
+                </div>
+
+                {codeError && <p className="auth-error">{codeError}</p>}
+
+                <button className="auth-cta" type="submit" disabled={verificationLoading}>
+                  {verificationLoading ? '...' : 'אמת ✓'}
+                </button>
+              </form>
+
+              <div className="auth-link">
+                <span onClick={() => setStep('initial')}>← חזור</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
