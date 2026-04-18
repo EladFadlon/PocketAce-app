@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, X, LogOut, History } from 'lucide-react';
 import type { User, GameRecord } from '../types';
 import { getRecentGames, calculateCumulativeProfitLoss, getCumulativeStatus } from '../utils/gameHistory';
-import { CREDIT_PACKAGES, simulatePurchase } from '../utils/credits';
+import { showModal } from './modals';
 import '../styles/lobby.css';
 
 interface LobbyProps {
@@ -18,7 +17,6 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, onCre
   const [recentGames, setRecentGames] = useState<GameRecord[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameRecord | null>(null);
   const [status, setStatus] = useState({ badge: '', message: '' });
-  const [purchasingId, setPurchasingId] = useState<string | null>(null);
 
   useEffect(() => {
     const hasVisited = localStorage.getItem('pocketAceVisited');
@@ -32,267 +30,193 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, onCre
     setStatus(getCumulativeStatus(cumulative));
   }, [user.id, user.name]);
 
-  const handleBuyPackage = async (packageId: string) => {
-    if (purchasingId) return;
-    setPurchasingId(packageId);
-    try {
-      const credits = await simulatePurchase(packageId);
-      onCreditsUpdate(credits);
-    } catch {
-      // purchase failed — user stays on same screen
-    } finally {
-      setPurchasingId(null);
-    }
-  };
-
   const firstName = user.name.split(' ')[0];
+  const firstLetter = firstName.charAt(0);
+
+  const CREW_COLORS = ['linear-gradient(135deg,#e74c3c,#c0392b)', 'linear-gradient(135deg,#3498db,#2980b9)', 'linear-gradient(135deg,#2ecc71,#27ae60)'];
+  const CREW_SHADOWS = ['rgba(231,76,60,0.4)', 'rgba(52,152,219,0.4)', 'rgba(46,204,113,0.4)'];
+  const CREW_EMOJIS = ['🤙', '😎', '🦈'];
 
   return (
     <div className="lobby-screen">
-      <div className="lobby-bg" />
-
-      {/* Header */}
-      <div className="lobby-header">
-        <motion.button
-          className="btn-logout"
-          onClick={onLogout}
-          whileTap={{ scale: 0.9 }}
-          title="התנתק"
-        >
-          <LogOut size={18} />
-        </motion.button>
-
-        <span className="lobby-greeting">שלום, {firstName} 👋</span>
-
+      {/* Top bar */}
+      <div className="lobby-topbar">
+        <div className="lobby-user">
+          <div className="lobby-avatar">{firstLetter}</div>
+          <div>
+            <div className="lobby-greeting-label">שלום,</div>
+            <div className="lobby-greeting-name">{firstName} 🤙</div>
+          </div>
+        </div>
         <div className="lobby-credits-pill">
-          <Zap size={14} />
-          <span className="credits-count">{user.credits}</span>
+          <span>⚡</span>
+          <span>{user.credits}</span>
+          <small>קרדיטים</small>
         </div>
       </div>
 
-      {/* Logo */}
-      <motion.div
-        className="lobby-logo"
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.7, type: 'spring', stiffness: 100 }}
-      >
-        <h1 className="logo-text">♠ Pocket Ace ♠</h1>
-      </motion.div>
-
-      {/* CTA */}
-      <motion.div
-        className="lobby-cta"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.5 }}
-      >
-        <button className="btn-new-game" onClick={onStartGame}>
-          <Zap size={26} />
-          <span>פתיחת שולחן</span>
-        </button>
-      </motion.div>
-
-      {/* Scrollable content */}
       <div className="lobby-scroll">
-
-        {/* Cumulative status */}
-        {recentGames.length > 0 && status.badge && (
-          <motion.div
-            className="lobby-status-card"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <span className="status-badge">{status.badge}</span>
-            <span className="status-msg">{status.message}</span>
-          </motion.div>
-        )}
-
-        {/* Recent games history */}
-        {recentGames.length > 0 && (
-          <motion.div
-            className="lobby-history-card"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <div className="history-header">
-              <History size={15} />
-              <span>משחקים אחרונים</span>
-            </div>
-            {recentGames.map(game => (
-              <motion.button
-                key={game.id}
-                className="history-item"
-                onClick={() => setSelectedGame(game)}
-                whileTap={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
-              >
-                <span className="history-date">
-                  {new Date(game.date).toLocaleDateString('he-IL', { month: 'short', day: 'numeric' })}
-                </span>
-                <div className="history-details">
-                  {game.topShark && (
-                    <span>🦈 {game.topShark.name}: +{game.topShark.amount.toFixed(0)}₪</span>
-                  )}
-                  <span className="history-debts">💰 {game.debts.length} חובות</span>
+        {/* Stats */}
+        {recentGames.length > 0 && (() => {
+          const cumulative = calculateCumulativeProfitLoss(user.id, user.name);
+          return (
+            <div className="lobby-stats">
+              <div className={`lobby-stat-card ${cumulative > 0 ? 'green' : ''}`}>
+                <div className={`lobby-stat-value ${cumulative > 0 ? 'green' : ''}`}>
+                  {cumulative > 0 ? '+' : ''}{cumulative.toFixed(0)}₪
                 </div>
-                <span style={{ color: 'var(--text-dim)', fontSize: 16 }}>‹</span>
-              </motion.button>
-            ))}
-          </motion.div>
-        )}
-
-        {/* Credits store */}
-        <motion.div
-          className="store-section"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <div className="store-section-header">
-            <Zap size={16} />
-            <span>חנות קרדיטים</span>
-          </div>
-
-          {CREDIT_PACKAGES.map(pkg => {
-            const ICONS: Record<string, string> = { fish: '🐟', regular: '⭐', shark: '🦈' };
-            const isLoading = purchasingId === pkg.id;
-            return (
-              <div
-                key={pkg.id}
-                className={`store-item${pkg.bestValue ? ' store-item--featured' : ''}`}
-              >
-                <span className="store-item-icon">{ICONS[pkg.id] ?? '🎰'}</span>
-
-                <div className="store-item-info">
-                  <span className="store-item-name">
-                    {pkg.name}
-                    {pkg.bestValue && <span className="featured-tag">הכי משתלם</span>}
-                  </span>
-                  <span className="store-item-meta">
-                    {pkg.games} משחקים · {(pkg.price / pkg.games).toFixed(0)}₪ למשחק
-                  </span>
-                </div>
-
-                <div className="store-item-right">
-                  <span className="store-item-price">{pkg.price}₪</span>
-                  <motion.button
-                    className="btn-buy"
-                    disabled={!!purchasingId}
-                    onClick={() => handleBuyPackage(pkg.id)}
-                    whileTap={!purchasingId ? { scale: 0.95 } : {}}
-                  >
-                    {isLoading ? '⏳' : 'רכוש'}
-                  </motion.button>
-                </div>
+                <div className="lobby-stat-label">סה&quot;כ רווח</div>
               </div>
-            );
-          })}
-        </motion.div>
+              <div className="lobby-stat-card">
+                <div className="lobby-stat-value">{recentGames.length}</div>
+                <div className="lobby-stat-label">משחקים</div>
+              </div>
+              <div className="lobby-stat-card yellow">
+                <div className="lobby-stat-value yellow">{status.badge || '🃏'}</div>
+                <div className="lobby-stat-label" style={{ color: 'rgba(245,197,24,0.6)' }}>סטטוס</div>
+              </div>
+            </div>
+          );
+        })()}
 
-      </div>{/* end lobby-scroll */}
+        {/* Crew */}
+        <div className="lobby-crew">
+          <div className="lobby-section-label">החבר׳ה הקבועים</div>
+          <div className="lobby-crew-row">
+            {CREW_EMOJIS.map((emoji, i) => (
+              <div className="lobby-crew-member" key={i}>
+                <div
+                  className="lobby-crew-avatar"
+                  style={{ background: CREW_COLORS[i], boxShadow: `0 4px 12px ${CREW_SHADOWS[i]}` }}
+                >{emoji}</div>
+                <span className="lobby-crew-name">שחקן {i + 1}</span>
+              </div>
+            ))}
+            <div className="lobby-crew-member">
+              <div className="lobby-crew-add">+</div>
+              <span className="lobby-crew-name">הוסף</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="lobby-cta-wrap">
+          <motion.button className="lobby-cta" onClick={onStartGame} whileTap={{ scale: 0.97 }}>
+            <span>⚡</span><span>פותחים שולחן</span><span>🃏</span>
+          </motion.button>
+          <div className="lobby-cta-sub">עולה קרדיט אחד</div>
+        </div>
+
+        {/* Recent games */}
+        {recentGames.length > 0 && (
+          <div className="lobby-history">
+            <div className="lobby-section-label">משחקים אחרונים</div>
+            {recentGames.map(game => {
+              const myResult = game.playerResults?.find(p => p.name === user.name);
+              const amount = myResult?.profitLossAfterFee ?? 0;
+              return (
+                <motion.button
+                  key={game.id}
+                  className="lobby-history-item"
+                  onClick={() => setSelectedGame(game)}
+                  whileTap={{ opacity: 0.7 }}
+                >
+                  <div>
+                    <div className="lobby-history-title">
+                      {new Date(game.date).toLocaleDateString('he-IL', { month: 'short', day: 'numeric' })} • {game.debts.length + 1} שחקנים
+                    </div>
+                    <div className="lobby-history-sub">{game.debts.length} חובות</div>
+                  </div>
+                  <div className={`lobby-history-amount ${amount >= 0 ? 'win' : 'loss'}`}>
+                    {game.topShark ? `🦈 +${game.topShark.amount.toFixed(0)}₪` : `${amount >= 0 ? '+' : ''}${amount.toFixed(0)}₪`}
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Store teaser */}
+        <div className="lobby-store-teaser">
+          <div>
+            <div className="lobby-store-title">⚡ נגמרו הקרדיטים?</div>
+            <div className="lobby-store-sub">קנה חבילה ושחק עוד</div>
+          </div>
+          <button
+            className="lobby-store-btn"
+            onClick={() => showModal({ type: 'store', data: { onPurchase: onCreditsUpdate } })}
+          >חנות</button>
+        </div>
+      </div>
+
+      {/* Logout */}
+      <div className="lobby-logout">
+        <button className="lobby-logout-btn" onClick={onLogout}>
+          <span>↩</span><span>התנתק</span>
+        </button>
+      </div>
 
       {/* Game details bottom sheet */}
       <AnimatePresence>
         {selectedGame && (
           <motion.div
-            className="game-details-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="lobby-sheet-overlay"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setSelectedGame(null)}
           >
             <motion.div
-              className="game-details-card"
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
+              className="lobby-sheet-card"
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               onClick={e => e.stopPropagation()}
             >
-              <motion.button
-                className="details-close-btn"
-                onClick={() => setSelectedGame(null)}
-                whileTap={{ scale: 0.9 }}
-              >
-                <X size={20} />
-              </motion.button>
-
-              <h2>📊 תוצאות המשחק</h2>
-
-              <div className="game-details-content" style={{ direction: 'rtl' }}>
-                <div className="details-header">
-                  <p><strong>תאריך:</strong> {new Date(selectedGame.date).toLocaleDateString('he-IL')}</p>
-                  <p><strong>מארח:</strong> {selectedGame.hostsName}</p>
-                  <p><strong>סכום כולל:</strong> {selectedGame.totalPot.toFixed(0)}₪</p>
+              <button className="lobby-sheet-close" onClick={() => setSelectedGame(null)}>✕</button>
+              <h2 className="lobby-sheet-title">📊 תוצאות המשחק</h2>
+              <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                {new Date(selectedGame.date).toLocaleDateString('he-IL')} • מארח: {selectedGame.hostsName}
+              </p>
+              {selectedGame.topShark && (
+                <div style={{ margin: '12px 0', padding: '12px', background: 'rgba(46,204,113,0.08)', borderRadius: 12, border: '1px solid rgba(46,204,113,0.2)' }}>
+                  <div style={{ fontSize: 12, color: 'var(--green)', fontWeight: 700 }}>🦈 המנצח</div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#fff' }}>{selectedGame.topShark.name}</div>
+                  <div style={{ fontSize: 14, color: 'var(--green)', fontWeight: 700 }}>+{selectedGame.topShark.amount.toFixed(0)}₪</div>
                 </div>
-
-                {selectedGame.topShark && (
-                  <div className="top-shark-display">
-                    <h3>🦈 המנצח הגדול</h3>
-                    <p className="top-shark-name">{selectedGame.topShark.name}</p>
-                    <p className="top-shark-amount">+{selectedGame.topShark.amount.toFixed(0)}₪</p>
-                  </div>
-                )}
-
-                {selectedGame.debts.length > 0 && (
-                  <div className="debts-display">
-                    <h3>💰 חובות</h3>
-                    <div className="debts-list">
-                      {selectedGame.debts.map((debt, idx) => (
-                        <div key={idx} className="debt-item">
-                          <span className="debt-from">{debt.from}</span>
-                          <span className="debt-arrow">←</span>
-                          <span className="debt-to">{debt.to}</span>
-                          <span className="debt-amount">{debt.amount.toFixed(0)}₪</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button className="btn-back-to-lobby" onClick={() => setSelectedGame(null)}>
-                סגור
-              </button>
+              )}
+              {selectedGame.debts.map((debt, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border)', fontSize: 12 }}>
+                  <span style={{ color: '#fff', fontWeight: 700 }}>{debt.from}</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>חייב ל-{debt.to}</span>
+                  <span style={{ color: 'var(--yellow)', fontWeight: 700 }}>{debt.amount.toFixed(0)}₪</span>
+                </div>
+              ))}
+              <button
+                onClick={() => setSelectedGame(null)}
+                style={{ marginTop: 16, width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px', borderRadius: 12, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+              >סגור</button>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Welcome popup (first visit only) */}
+      {/* Welcome popup */}
       <AnimatePresence>
         {showWelcome && (
           <motion.div
-            className="welcome-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           >
             <motion.div
-              className="welcome-popup"
-              initial={{ scale: 0.85, y: 24 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.85, y: 24 }}
+              style={{ background: '#0f0f1a', borderRadius: 20, border: '1px solid var(--border)', padding: 24, width: '100%', maxWidth: 340, position: 'relative', direction: 'rtl' }}
+              initial={{ scale: 0.85, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85, y: 24 }}
               transition={{ type: 'spring', stiffness: 120, damping: 18 }}
             >
-              <motion.button
-                className="close-btn"
+              <button onClick={() => setShowWelcome(false)} style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.06)', border: 'none', width: 32, height: 32, borderRadius: '50%', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <h2 style={{ fontSize: 18, fontWeight: 900, margin: '0 0 8px' }}>ברוכים הבאים ל-Pocket Ace ♠</h2>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 20px' }}>כל משחק עולה קרדיט אחד. הקרדיט ינוכה רק כשהמשחק מתחיל. 💎</p>
+              <button
                 onClick={() => setShowWelcome(false)}
-                whileTap={{ scale: 0.9 }}
-              >
-                <X size={22} />
-              </motion.button>
-              <h2>ברוכים הבאים ל-Pocket Ace ♠</h2>
-              <p>כל משחק עולה קרדיט אחד. הקרדיט ינוכה רק כשהמשחק מתחיל. 💎</p>
-              <motion.button
-                className="welcome-confirm"
-                onClick={() => setShowWelcome(false)}
-                whileTap={{ scale: 0.95 }}
-              >
-                בואו נתחיל 🎰
-              </motion.button>
+                style={{ width: '100%', background: 'linear-gradient(135deg,var(--yellow),var(--yellow-dark))', color: '#111', border: 'none', padding: 14, borderRadius: 14, fontSize: 15, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}
+              >בואו נתחיל 🎰</button>
             </motion.div>
           </motion.div>
         )}
