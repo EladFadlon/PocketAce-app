@@ -1,0 +1,16 @@
+/* ─── ROOT APP SHELL ─────────────────────────────────────────── */
+/* height: 100dvh fixes iOS Safari's bottom-bar height bug      */
+/* (100vh includes the toolbar area; 100dvh tracks visible area) */
+.app {
+  width: 100%;
+  height: 100vh;           /* fallback for browsers that lack dvh */
+  height: 100dvh;          /* dynamic viewport height — the real fix */
+  direction: rtl;
+  text-align: right;
+  background: var(--bg-primary);
+  overflow: hidden;        /* each screen manages its own scroll */
+}
+
+@supports (height: 100dvh) {
+  .app { height: 100dvh; }
+}

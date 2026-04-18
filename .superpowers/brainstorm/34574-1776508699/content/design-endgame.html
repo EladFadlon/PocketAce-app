@@ -1,0 +1,154 @@
+<h2>מסך 5 — סיום משחק 🏁</h2>
+<p class="subtitle">הזנת ז׳יטונים סופיים לכל שחקן לפני חישוב</p>
+
+<div class="mockup" style="max-width:390px;margin:0 auto;">
+  <div class="mockup-header">EndGame Screen</div>
+  <div class="mockup-body" style="
+    background: #080810;
+    padding: 0;
+    border-radius: 0 0 16px 16px;
+    font-family: -apple-system, 'Heebo', sans-serif;
+    direction: rtl;
+    overflow: hidden;
+    min-height: 620px;
+    display: flex;
+    flex-direction: column;
+  ">
+
+    <!-- Header -->
+    <div style="
+      display:flex;justify-content:space-between;align-items:center;
+      padding:14px 16px;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+    ">
+      <div style="font-size:18px;font-weight:900;color:#fff;">כמה ז׳יטונים יש לך? 🏁</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.2);cursor:pointer;">← חזור</div>
+    </div>
+
+    <!-- Total pot reminder -->
+    <div style="
+      margin:12px 16px 4px;
+      background:linear-gradient(135deg,rgba(245,197,24,0.08),rgba(245,197,24,0.02));
+      border:1px solid rgba(245,197,24,0.18);
+      border-radius:12px;
+      padding:10px 14px;
+      display:flex;justify-content:space-between;align-items:center;
+    ">
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);">סה״כ ז׳יטונים בשולחן</div>
+      <div style="font-size:14px;font-weight:900;color:#f5c518;">700 ז׳יטונים</div>
+    </div>
+
+    <!-- Player chip inputs -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:8px;padding:12px 16px;overflow:hidden;">
+
+      <!-- Player 1 — Red -->
+      <div style="
+        background:linear-gradient(135deg,rgba(231,76,60,0.12),rgba(231,76,60,0.04));
+        border:1px solid rgba(231,76,60,0.3);
+        border-radius:14px;
+        padding:12px 14px;
+        display:flex;align-items:center;gap:12px;
+      ">
+        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#e74c3c,#c0392b);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(231,76,60,0.4);">🤙</div>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;">אמיר</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.3);">השקיע: 300₪ (×2)</div>
+        </div>
+        <div style="
+          display:flex;align-items:center;gap:6px;
+          background:rgba(0,0,0,0.3);
+          border:1px solid rgba(231,76,60,0.4);
+          border-radius:10px;
+          padding:4px 8px;
+        ">
+          <div style="font-size:16px;color:rgba(231,76,60,0.6);cursor:pointer;padding:0 2px;">−</div>
+          <div style="font-size:15px;font-weight:900;color:#fff;min-width:36px;text-align:center;">240</div>
+          <div style="font-size:16px;color:#e74c3c;cursor:pointer;padding:0 2px;">+</div>
+        </div>
+      </div>
+
+      <!-- Player 2 — Blue -->
+      <div style="
+        background:linear-gradient(135deg,rgba(52,152,219,0.12),rgba(52,152,219,0.04));
+        border:1px solid rgba(52,152,219,0.3);
+        border-radius:14px;
+        padding:12px 14px;
+        display:flex;align-items:center;gap:12px;
+      ">
+        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#3498db,#2980b9);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(52,152,219,0.4);">😎</div>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;">דני</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.3);">השקיע: 150₪ (×1)</div>
+        </div>
+        <div style="
+          display:flex;align-items:center;gap:6px;
+          background:rgba(0,0,0,0.3);
+          border:1px solid rgba(52,152,219,0.4);
+          border-radius:10px;
+          padding:4px 8px;
+        ">
+          <div style="font-size:16px;color:rgba(52,152,219,0.6);cursor:pointer;padding:0 2px;">−</div>
+          <div style="font-size:15px;font-weight:900;color:#fff;min-width:36px;text-align:center;">80</div>
+          <div style="font-size:16px;color:#3498db;cursor:pointer;padding:0 2px;">+</div>
+        </div>
+      </div>
+
+      <!-- Player 3 — Green HOST -->
+      <div style="
+        background:linear-gradient(135deg,rgba(46,204,113,0.12),rgba(46,204,113,0.04));
+        border:1px solid rgba(46,204,113,0.3);
+        border-radius:14px;
+        padding:12px 14px;
+        display:flex;align-items:center;gap:12px;
+      ">
+        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#2ecc71,#27ae60);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(46,204,113,0.4);">🦈</div>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;">מושי <span style="font-size:9px;background:#f5c518;color:#111;padding:1px 5px;border-radius:4px;font-weight:700;">👑</span></div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.3);">השקיע: 300₪ (×2)</div>
+        </div>
+        <div style="
+          display:flex;align-items:center;gap:6px;
+          background:rgba(0,0,0,0.3);
+          border:1px solid rgba(46,204,113,0.4);
+          border-radius:10px;
+          padding:4px 8px;
+        ">
+          <div style="font-size:16px;color:rgba(46,204,113,0.6);cursor:pointer;padding:0 2px;">−</div>
+          <div style="font-size:15px;font-weight:900;color:#fff;min-width:36px;text-align:center;">380</div>
+          <div style="font-size:16px;color:#2ecc71;cursor:pointer;padding:0 2px;">+</div>
+        </div>
+      </div>
+
+      <!-- Validation indicator -->
+      <div style="
+        display:flex;justify-content:space-between;align-items:center;
+        padding:8px 12px;
+        background:rgba(46,204,113,0.08);
+        border:1px solid rgba(46,204,113,0.2);
+        border-radius:10px;
+        margin-top:4px;
+      ">
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);">סה״כ הוזן</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="font-size:13px;font-weight:800;color:#2ecc71;">700 ✅</div>
+          <div style="font-size:9px;color:rgba(46,204,113,0.6);">מדויק!</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom CTA -->
+    <div style="padding:10px 16px 20px;border-top:1px solid rgba(255,255,255,0.05);">
+      <button style="
+        width:100%;
+        background:linear-gradient(135deg,#f5c518,#d4a017);
+        color:#111;border:none;
+        padding:15px 0;border-radius:14px;
+        font-size:15px;font-weight:900;
+        cursor:pointer;
+        box-shadow:0 6px 24px rgba(245,197,24,0.38);
+      ">חשב מי חייב למי 🧮</button>
+    </div>
+
+  </div>
+</div>

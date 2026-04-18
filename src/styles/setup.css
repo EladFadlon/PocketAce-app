@@ -1,0 +1,341 @@
+/* Setup Screen Styles */
+.setup-container {
+  min-height: 100vh;
+  width: 100%;
+  padding: 2rem 1.5rem;
+  padding-bottom: 3rem;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  overflow-y: auto;
+}
+
+.setup-header {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.setup-header-with-back {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0;
+  gap: 1rem;
+}
+
+.btn-back-home {
+  background: transparent;
+  border: 2px solid var(--accent-gold);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-gold);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn-back-home:hover {
+  background: rgba(212, 175, 55, 0.1);
+  transform: scale(1.05);
+}
+
+.btn-back-home:active {
+  transform: scale(0.95);
+}
+
+.setup-header .title {
+  font-size: 3.5rem;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-emerald) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+}
+
+.setup-header .subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Cards */
+.settings-card,
+.players-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(20px);
+}
+
+.settings-card h2,
+.players-card h2 {
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+/* Settings Grid */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.setting-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.setting-input label {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-direction: row-reverse;
+}
+
+.input-group button {
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.input-group button:hover {
+  background: var(--accent-gold-light);
+  transform: scale(1.05);
+}
+
+.input-group button:active {
+  transform: scale(0.98);
+}
+
+.input-group input {
+  flex: 1;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Players Management */
+.add-player-form {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-direction: row-reverse;
+}
+
+.player-input {
+  flex: 1;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: right;
+}
+
+.player-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.btn-add-player {
+  background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-emerald-light) 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(45, 159, 111, 0.3);
+}
+
+.btn-add-player:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(45, 159, 111, 0.4);
+}
+
+.btn-add-player:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.no-players {
+  text-align: center;
+  color: var(--text-tertiary);
+  padding: 2rem 1rem;
+  font-size: 0.95rem;
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.player-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.player-item:hover {
+  border-color: var(--accent-gold);
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.player-number {
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.player-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.host-badge {
+  color: #d4af37;
+  filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.5));
+}
+
+.btn-remove {
+  background: rgba(255, 68, 68, 0.1);
+  color: #ff4444;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.btn-remove:hover {
+  background: rgba(255, 68, 68, 0.2);
+}
+
+.btn-remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-remove:disabled:hover {
+  background: rgba(255, 68, 68, 0.1);
+}
+
+/* Start Button */
+.btn-start {
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-light) 100%);
+  color: var(--bg-primary);
+  padding: 1.25rem 2rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  transition: all 0.3s;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+  margin-top: 1rem;
+}
+
+.btn-start:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.5);
+}
+
+.btn-start:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.help-text {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .setup-container {
+    padding: 1rem;
+  }
+
+  .setup-header .title {
+    font-size: 2.5rem;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .add-player-form {
+    flex-direction: column-reverse;
+  }
+
+  .input-group button {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1rem;
+  }
+}

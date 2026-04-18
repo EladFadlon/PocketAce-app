@@ -1,0 +1,426 @@
+/* Modal Overlays & Base Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(20, 20, 35, 0.95) 100%);
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+  position: relative;
+  text-align: center;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: #d4af37;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: #f4d03f;
+}
+
+.modal-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f5f5f7;
+  margin: 1rem 0 0.5rem;
+}
+
+.modal-title.critical {
+  color: #ef4444;
+}
+
+.modal-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+  color: #1a1a1e;
+}
+
+.modal-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+}
+
+.modal-btn.primary.danger {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+  color: white;
+}
+
+.modal-btn.secondary {
+  background: rgba(161, 161, 166, 0.1);
+  color: #a1a1a6;
+  border: 1px solid rgba(161, 161, 166, 0.2);
+}
+
+.modal-btn.secondary:hover {
+  background: rgba(161, 161, 166, 0.2);
+  border-color: rgba(161, 161, 166, 0.4);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-buttons .modal-btn {
+  flex: 1;
+}
+
+/* Welcome Gift Modal */
+.welcome-gift-modal {
+  max-width: 450px;
+}
+
+.gift-icon {
+  font-size: 4rem;
+  margin: 1rem 0;
+  color: #d4af37;
+}
+
+.gift-message {
+  margin: 1.5rem 0;
+}
+
+.big-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f4d03f;
+  margin: 0.5rem 0;
+}
+
+.sub-text {
+  color: #a1a1a6;
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+
+.gift-description {
+  color: #a1a1a6;
+  font-size: 0.95rem;
+  margin: 1rem 0 1.5rem;
+}
+
+/* Credit Confirmation Modal */
+.credit-confirmation-modal {
+  max-width: 400px;
+}
+
+.modal-icon {
+  font-size: 3.5rem;
+  margin: 1rem 0;
+}
+
+.credit-info {
+  background: rgba(45, 159, 111, 0.1);
+  border: 1px solid rgba(45, 159, 111, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.credit-label {
+  color: #a1a1a6;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.credit-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.5rem 0 0;
+}
+
+.credit-amount.normal {
+  color: #3cb371;
+}
+
+.credit-amount.critical {
+  color: #ef4444;
+}
+
+.confirmation-message {
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.confirmation-message p {
+  color: #f5f5f7;
+  margin: 0.5rem 0;
+}
+
+.warning-banner {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  color: #fca5a5;
+  font-weight: 600;
+}
+
+/* Store Modal */
+.store-modal {
+  max-width: 600px;
+}
+
+.store-icon {
+  font-size: 3.5rem;
+  margin: 1rem 0;
+}
+
+.store-subtitle {
+  color: #a1a1a6;
+  font-size: 0.95rem;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.packages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.package-card {
+  background: rgba(45, 159, 111, 0.1);
+  border: 2px solid rgba(45, 159, 111, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+}
+
+.package-card:hover:not(.purchasing) {
+  border-color: rgba(212, 175, 55, 0.6);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.package-card.best-value {
+  border-color: rgba(212, 175, 55, 0.5);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(45, 159, 111, 0.1) 100%);
+}
+
+.package-card.purchasing {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.best-value-badge {
+  position: absolute;
+  top: -10px;
+  background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+  color: #1a1a1e;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.package-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: #d4af37;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.package-loading p {
+  color: #d4af37;
+  font-weight: 600;
+}
+
+.package-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f5f5f7;
+  margin: 0 0 0.5rem;
+}
+
+.package-games {
+  color: #3cb371;
+  font-size: 0.9rem;
+  margin: 0.25rem 0;
+  font-weight: 600;
+}
+
+.package-price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #d4af37;
+  margin: 0.5rem 0;
+}
+
+.buy-btn {
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  color: #d4af37;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+}
+
+.buy-btn:hover {
+  background: rgba(212, 175, 55, 0.4);
+  border-color: rgba(212, 175, 55, 0.8);
+}
+
+.store-footer {
+  color: #666666;
+  font-size: 0.8rem;
+  margin-top: 1rem;
+}
+
+/* Success Content */
+.success-content {
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: #3cb371;
+  margin: 1rem 0;
+}
+
+.success-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #3cb371;
+  margin: 1rem 0;
+}
+
+.success-message {
+  color: #a1a1a6;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Game Over Modal */
+.game-over-modal {
+  max-width: 450px;
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.game-over-icon {
+  font-size: 4rem;
+  color: #ef4444;
+  margin: 1rem 0;
+}
+
+.game-over-message {
+  margin: 1.5rem 0;
+}
+
+.game-over-message .main-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f5f5f7;
+  margin: 0;
+}
+
+.game-over-message .sub-text {
+  color: #fca5a5;
+  margin-top: 0.5rem;
+}
+
+.urgency-banner {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  color: #fca5a5;
+  font-weight: 600;
+}
+
+.urgency-banner p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .modal-content {
+    padding: 1. 5rem;
+    width: 95%;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+  }
+
+  .packages-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+  }
+}

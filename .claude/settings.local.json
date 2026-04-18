@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(python3 /Users/macbookpro/.claude/skills/ui-ux-pro-max/scripts/search.py \"mobile poker game friends group hood urban dark glassmorphism\" --design-system --persist -p \"PocketAce\" -f markdown)",
+      "Bash(python3 /Users/macbookpro/.claude/skills/ui-ux-pro-max/scripts/search.py \"glassmorphism dark neon urban\" --domain style -n 3)",
+      "Bash(python3 /Users/macbookpro/.claude/skills/ui-ux-pro-max/scripts/search.py \"animation touch mobile\" --domain ux -n 5)"
+    ]
+  }
+}
