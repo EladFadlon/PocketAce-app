@@ -111,7 +111,7 @@ input, textarea, select {
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: var(--gold);
+  border-color: var(--yellow);
   box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.14);
 }
 
@@ -159,7 +159,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-gold);
+  border: 1px solid var(--yellow-border);
   border-radius: var(--radius-lg);
 }
 
@@ -167,12 +167,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow:
-      0 0 20px var(--gold-glow),
+      0 0 20px var(--yellow-glow),
       0 6px 24px rgba(0, 0, 0, 0.45);
   }
   50% {
     box-shadow:
-      0 0 48px var(--gold-glow),
+      0 0 48px var(--yellow-glow),
       0 0 72px rgba(212, 175, 55, 0.18),
       0 6px 24px rgba(0, 0, 0, 0.45);
   }
