@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+
+const PLAYER_COLORS = [
+  { bg: 'linear-gradient(135deg,#e74c3c,#c0392b)', cardBg: 'linear-gradient(145deg,rgba(231,76,60,0.15),rgba(231,76,60,0.05))', border: 'rgba(231,76,60,0.35)', glow: 'rgba(231,76,60,0.45)', text: '#e74c3c' },
+  { bg: 'linear-gradient(135deg,#3498db,#2980b9)', cardBg: 'linear-gradient(145deg,rgba(52,152,219,0.15),rgba(52,152,219,0.05))',  border: 'rgba(52,152,219,0.35)',  glow: 'rgba(52,152,219,0.45)',  text: '#3498db' },
+  { bg: 'linear-gradient(135deg,#2ecc71,#27ae60)', cardBg: 'linear-gradient(145deg,rgba(46,204,113,0.15),rgba(46,204,113,0.05))',  border: 'rgba(46,204,113,0.35)',  glow: 'rgba(46,204,113,0.45)',  text: '#2ecc71' },
+  { bg: 'linear-gradient(135deg,#9b59b6,#8e44ad)', cardBg: 'linear-gradient(145deg,rgba(155,89,182,0.15),rgba(155,89,182,0.05))',  border: 'rgba(155,89,182,0.35)',  glow: 'rgba(155,89,182,0.45)',  text: '#9b59b6' },
+  { bg: 'linear-gradient(135deg,#ff6b35,#e55a24)', cardBg: 'linear-gradient(145deg,rgba(255,107,53,0.15),rgba(255,107,53,0.05))',  border: 'rgba(255,107,53,0.35)',  glow: 'rgba(255,107,53,0.45)',  text: '#ff6b35' },
+  { bg: 'linear-gradient(135deg,#f39c12,#d68910)', cardBg: 'linear-gradient(145deg,rgba(243,156,18,0.15),rgba(243,156,18,0.05))',  border: 'rgba(243,156,18,0.35)',  glow: 'rgba(243,156,18,0.45)',  text: '#f39c12' },
+];
+const PLAYER_EMOJIS = ['🤙', '😎', '🦈', '🤑', '😈', '🃏'];
 import type { Player, GameSettings } from '../types';
 import '../styles/endgame.css';
 
@@ -17,150 +26,91 @@ export const EndGame: React.FC<EndGameProps> = ({
   settings,
   onCalculate,
   onBack,
-  onHome
 }) => {
   const [finalChips, setFinalChips] = useState<Record<string, number>>(
     players.reduce((acc, p) => ({ ...acc, [p.id]: p.buyIns * settings.chipsPerBuyIn }), {})
   );
 
-  // Calculate total chips purchased during the game
-  const totalBoughtChips = players.reduce((sum, p) => sum + (p.buyIns * settings.chipsPerBuyIn), 0);
-  
-  const allFilled = players.every(p => typeof finalChips[p.id] === 'number');
-  const totalChips = Object.values(finalChips).reduce((a, b) => a + b, 0);
-  const expectedChips = totalBoughtChips;  // MUST equal total purchased chips
-  
-  // Chip validation: must match exactly
-  const chipsBalance = totalChips - expectedChips;
-  const chipsMatch = Math.abs(chipsBalance) < 0.01;
-  const missingChips = Math.max(0, expectedChips - totalChips);
+  const handleChipChange = (playerId: string, value: number) => {
+    setFinalChips({ ...finalChips, [playerId]: Math.max(0, value) });
+  };
 
   const handleCalculate = () => {
     onCalculate(finalChips);
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.1 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-  };
+  const totalZhetons = players.reduce((sum, p) => sum + (p.buyIns * settings.chipsPerBuyIn), 0);
+  const currentTotal = Object.values(finalChips).reduce((sum, v) => sum + (v || 0), 0);
+  const isValid = currentTotal === totalZhetons;
 
   return (
-    <motion.div
-      className="endgame-container"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* Header with Back Button */}
-      <motion.div className="endgame-header-with-back" variants={itemVariants}>
-        <motion.button 
-          className="btn-back-home" 
-          onClick={onHome}
-          whileTap={{ scale: 0.9 }}
-          title="חזור לבית"
-        >
-          <ArrowLeft size={24} />
-        </motion.button>
-        <div>
-          <h1>שבור את הכלים</h1>
-          <p className="subtitle">הכנס את הספירה הסופית של הז׳יטונים של כל שחקן</p>
-        </div>
-        <div style={{ width: '48px' }} />
-      </motion.div>
+    <div className="endgame-screen">
+      <div className="endgame-header">
+        <h1 className="endgame-title">כמה ז׳יטונים יש לך? 🏁</h1>
+        <button className="endgame-back" onClick={onBack}>← חזור</button>
+      </div>
 
-      {/* Players Input Grid */}
-      <motion.div className="players-input-grid" layout>
-        {players.map(player => (
-          <motion.div
-            key={player.id}
-            className="player-input-card"
-            variants={itemVariants}
-            layout
-          >
-            <label className="player-label">{player.name}</label>
-            <div className="chip-counter">
-              <button
-                onClick={() => {
-                  const current = finalChips[player.id] || 0;
-                  setFinalChips({
-                    ...finalChips,
-                    [player.id]: Math.max(0, current - settings.chipsPerBuyIn)
-                  });
-                }}
+      <div className="endgame-total-pill">
+        <span className="endgame-total-label">סה&quot;כ ז׳יטונים בשולחן</span>
+        <span className="endgame-total-value">{totalZhetons} ז׳יטונים</span>
+      </div>
+
+      <div className="endgame-body">
+        {players.map((player, index) => {
+          const color = PLAYER_COLORS[index % PLAYER_COLORS.length];
+          const emoji = PLAYER_EMOJIS[index % PLAYER_EMOJIS.length];
+          const value = finalChips[player.id] ?? 0;
+
+          return (
+            <div
+              key={player.id}
+              className="endgame-player-row"
+              style={{ background: color.cardBg, border: `1px solid ${color.border}` }}
+            >
+              <div
+                className="endgame-player-avatar"
+                style={{ background: color.bg, boxShadow: `0 4px 12px ${color.glow}` }}
+              >{emoji}</div>
+              <div className="endgame-player-info">
+                <div className="endgame-player-name">{player.name}</div>
+                <div className="endgame-player-invested">השקיע: {player.totalInvested}₪ (×{player.buyIns})</div>
+              </div>
+              <div
+                className="endgame-stepper"
+                style={{ border: `1px solid ${color.border}` }}
               >
-                −
-              </button>
-              <input
-                type="number"
-                value={finalChips[player.id] || ''}
-                onChange={e => {
-                  const val = parseInt(e.target.value);
-                  setFinalChips({
-                    ...finalChips,
-                    [player.id]: isNaN(val) ? 0 : Math.max(0, val)
-                  });
-                }}
-                className="chip-input"
-              />
-              <button
-                onClick={() => {
-                  const current = finalChips[player.id] || 0;
-                  setFinalChips({
-                    ...finalChips,
-                    [player.id]: current + settings.chipsPerBuyIn
-                  });
-                }}
-              >
-                +
-              </button>
+                <button
+                  className="endgame-stepper-btn"
+                  style={{ color: `${color.text}60` }}
+                  onClick={() => handleChipChange(player.id, Math.max(0, value - settings.chipsPerBuyIn))}
+                >−</button>
+                <div className="endgame-stepper-value">{value}</div>
+                <button
+                  className="endgame-stepper-btn"
+                  style={{ color: color.text }}
+                  onClick={() => handleChipChange(player.id, value + settings.chipsPerBuyIn)}
+                >+</button>
+              </div>
             </div>
-            <p className="chip-info">{finalChips[player.id] || 0} ז'יטונים</p>
-          </motion.div>
-        ))}
-      </motion.div>
+          );
+        })}
 
-      {/* Chip Total Check */}
-      <motion.div
-        className={`chip-total ${chipsMatch ? 'valid' : 'warning'}`}
-        variants={itemVariants}
-      >
-        <p>
-          <span className="label">סה"כ ז'יטונים:</span>
-          <span className="total">{totalChips}</span>
-          <span className="expected">/ {expectedChips}</span>
-        </p>
-        {!chipsMatch && (
-          <div className="warning-details">
-            <p className="warning-text">⚠️ חובה לאזן את השולחן כדי להמשיך</p>
-            <p className="warning-subtext">חסרים {missingChips} ז'יטונים</p>
-          </div>
-        )}
-      </motion.div>
+        <div className={`endgame-validation ${isValid ? 'valid' : 'invalid'}`}>
+          <span className="endgame-validation-label">סה&quot;כ הוזן</span>
+          <span className={`endgame-validation-value ${isValid ? 'valid' : 'invalid'}`}>
+            {currentTotal} {isValid ? '✅ מדויק!' : `/ ${totalZhetons}`}
+          </span>
+        </div>
+      </div>
 
-      {/* Action Buttons */}
-      <motion.div className="action-buttons" variants={itemVariants}>
-        <motion.button className="btn-back" onClick={onBack} whileTap={{ scale: 0.95 }}>
-          ← חזור
-        </motion.button>
+      <div className="endgame-footer">
         <motion.button
-          className="btn-calculate"
+          className="endgame-cta"
           onClick={handleCalculate}
-          disabled={!allFilled || !chipsMatch}
-          whileTap={{ scale: 0.95 }}
-          title={!chipsMatch ? "חייבים לתאום את סכום הזיטונים" : ""}
-        >
-          תקפלו תחבילה
-          <ArrowRight size={20} />
-        </motion.button>
-      </motion.div>
-    </motion.div>
+          disabled={!isValid}
+          whileTap={{ scale: 0.97 }}
+        >חשב מי חייב למי 🧮</motion.button>
+      </div>
+    </div>
   );
 };
