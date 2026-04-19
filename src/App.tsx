@@ -11,6 +11,7 @@ import { calculatePlayerSettlements, minimizeDebts } from './utils/settlements';
 import { getCurrentUser, logoutUser } from './utils/auth';
 import { saveGameRecord } from './utils/gameHistory';
 import { initializeAdMob, showBannerAd, removeBannerAd, showInterstitialAd } from './utils/admob';
+import { initializePurchases, checkPremiumStatus } from './utils/purchases';
 import './App.css';
 
 const GAME_SAVE_KEY = 'pocketAce_currentGame';
@@ -35,6 +36,15 @@ function App() {
     const user = getCurrentUser();
     if (!user) return;
     setCurrentUser(user);
+
+    initializePurchases(user.id).then(() => {
+      checkPremiumStatus().then(premium => {
+        if (premium) {
+          setIsPremium(true);
+          localStorage.setItem('pocketAce_isPremium', 'true');
+        }
+      });
+    });
 
     try {
       const saved = localStorage.getItem(GAME_SAVE_KEY);
