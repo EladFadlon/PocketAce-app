@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { GamePhase, GameSettings, Player, PlayerSettlement, Debt, User } from './types';
 import { GamePhase as GamePhaseEnum } from './types';
 import { Auth } from './components/Auth';
@@ -10,6 +10,7 @@ import { SettlementResults } from './components/SettlementResults';
 import { calculatePlayerSettlements, minimizeDebts } from './utils/settlements';
 import { getCurrentUser, logoutUser } from './utils/auth';
 import { saveGameRecord } from './utils/gameHistory';
+import { initializeAdMob, showBannerAd, removeBannerAd, showInterstitialAd } from './utils/admob';
 import './App.css';
 
 const GAME_SAVE_KEY = 'pocketAce_currentGame';
@@ -23,6 +24,7 @@ function App() {
   const [debts, setDebts] = useState<Debt[]>([]);
   const [hostFee, setHostFee] = useState(0);
   const [isPremium, setIsPremium] = useState(() => localStorage.getItem('pocketAce_isPremium') === 'true');
+  const gameJustEnded = useRef(false);
 
   const handlePremiumChange = useCallback((value: boolean) => {
     setIsPremium(value);
@@ -57,6 +59,18 @@ function App() {
       localStorage.removeItem(GAME_SAVE_KEY);
     }
   }, [phase, players, settings]);
+
+  useEffect(() => {
+    initializeAdMob();
+  }, []);
+
+  useEffect(() => {
+    if (phase === GamePhaseEnum.LOBBY && !isPremium) {
+      showBannerAd();
+    } else {
+      removeBannerAd();
+    }
+  }, [phase, isPremium]);
 
   const handleAuthSuccess = useCallback((user: User) => {
     setCurrentUser(user);
@@ -121,16 +135,21 @@ function App() {
       saveGameRecord(currentUser.id, host?.name || currentUser.name, ps, calculatedDebts);
     }
 
+    gameJustEnded.current = true;
     setPhase(GamePhaseEnum.RESULTS);
   }, [players, settings, currentUser]);
 
-  const resetToLobby = useCallback(() => {
+  const resetToLobby = useCallback(async () => {
+    if (gameJustEnded.current && !isPremium) {
+      gameJustEnded.current = false;
+      await showInterstitialAd();
+    }
     setPhase(GamePhaseEnum.LOBBY);
     setPlayers([]);
     setSettlements([]);
     setDebts([]);
     setHostFee(0);
-  }, []);
+  }, [isPremium]);
 
   const handleQuit = useCallback(() => {
     localStorage.removeItem(GAME_SAVE_KEY);
