@@ -17,6 +17,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
   const [recentGames, setRecentGames] = useState<GameRecord[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameRecord | null>(null);
   const [status, setStatus] = useState({ badge: '', message: '' });
+  const [cumulative, setCumulative] = useState(0);
 
   useEffect(() => {
     const hasVisited = localStorage.getItem('pocketAceVisited');
@@ -26,8 +27,9 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
     }
     const games = getRecentGames(user.id, 3);
     setRecentGames(games);
-    const cumulative = calculateCumulativeProfitLoss(user.id, user.name);
-    setStatus(getCumulativeStatus(cumulative));
+    const cumulativeValue = calculateCumulativeProfitLoss(user.id, user.name);
+    setCumulative(cumulativeValue);
+    setStatus(getCumulativeStatus(cumulativeValue));
   }, [user.id, user.name]);
 
   const firstName = user.name.split(' ')[0];
@@ -64,27 +66,24 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
 
       <div className="lobby-scroll">
         {/* Stats */}
-        {recentGames.length > 0 && (() => {
-          const cumulative = calculateCumulativeProfitLoss(user.id, user.name);
-          return (
-            <div className="lobby-stats">
-              <div className={`lobby-stat-card ${cumulative > 0 ? 'green' : ''}`}>
-                <div className={`lobby-stat-value ${cumulative > 0 ? 'green' : ''}`}>
-                  {cumulative > 0 ? '+' : ''}{cumulative.toFixed(0)}₪
-                </div>
-                <div className="lobby-stat-label">סה&quot;כ רווח</div>
+        {recentGames.length > 0 && (
+          <div className="lobby-stats">
+            <div className={`lobby-stat-card ${cumulative > 0 ? 'green' : ''}`}>
+              <div className={`lobby-stat-value ${cumulative > 0 ? 'green' : ''}`}>
+                {cumulative > 0 ? '+' : ''}{cumulative.toFixed(0)}₪
               </div>
-              <div className="lobby-stat-card">
-                <div className="lobby-stat-value">{recentGames.length}</div>
-                <div className="lobby-stat-label">משחקים</div>
-              </div>
-              <div className="lobby-stat-card yellow">
-                <div className="lobby-stat-value yellow">{status.badge || '🃏'}</div>
-                <div className="lobby-stat-label" style={{ color: 'rgba(245,197,24,0.6)' }}>סטטוס</div>
-              </div>
+              <div className="lobby-stat-label">סה&quot;כ רווח</div>
             </div>
-          );
-        })()}
+            <div className="lobby-stat-card">
+              <div className="lobby-stat-value">{recentGames.length}</div>
+              <div className="lobby-stat-label">משחקים</div>
+            </div>
+            <div className="lobby-stat-card yellow">
+              <div className="lobby-stat-value yellow">{status.badge || '🃏'}</div>
+              <div className="lobby-stat-label" style={{ color: 'rgba(245,197,24,0.6)' }}>סטטוס</div>
+            </div>
+          </div>
+        )}
 
         {/* Crew */}
         <div className="lobby-crew">
