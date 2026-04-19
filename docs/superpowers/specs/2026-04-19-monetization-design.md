@@ -33,8 +33,8 @@ Premium users see no ads; the banner slot disappears cleanly.
 ## Premium IAP
 
 - **Product type:** One-time purchase (non-consumable)
-- **Label:** "הסר פרסומות" (Remove Ads)
-- **Price:** ~₪4.90 (exact tier set in App Store Connect / Google Play Console)
+- **Label:** "בלי פרסומות. רק פוקר." (No Ads. Just Poker.)
+- **Price:** ₪7.90 (Apple App Store Tier 2, ~$2.15 — optimal for ad-removal IAPs in casual apps)
 - **Flow:** User taps a button in Lobby → native App Store / Play Store payment sheet → on success, `isPremium` flag set in app state → ads hidden
 - **Restore Purchase:** A "Restore" button (required by Apple) allows users who reinstall or switch devices to reclaim their purchase
 - **Backend:** RevenueCat handles receipt validation, restore logic, and cross-platform normalization — no custom server required
