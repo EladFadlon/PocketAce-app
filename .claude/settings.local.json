@@ -10,7 +10,11 @@
       "Bash(sed -i '' 's/var\\(--gold-glow\\)/var\\(--yellow-glow\\)/g' src/index.css)",
       "Bash(npx tsc *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(npm install *)",
+      "Bash(sudo chown *)",
+      "Bash(npm cache *)",
+      "Bash(npx cap *)"
     ]
   }
 }
