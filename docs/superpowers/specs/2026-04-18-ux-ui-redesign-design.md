@@ -32,7 +32,7 @@ Full visual redesign of PocketAce — a Hebrew-language poker game manager for f
 ### Tone
 Hebrew throughout, casual street slang. Key copy:
 - CTA: "בוא נשחק 🤙", "פותחים שולחן 🃏", "יאללה, מתחילים! 🚀"
-- Forgot password: "קליק כאן אחי"
+- Forgot password: "לחץ כאן , נזכיר לך"
 - Sign up: "פתח חשבון — זה שניה"
 - End game: "חשב מי חייב למי 🧮"
 - Play again: "משחק נוסף? יאללה 🃏"
@@ -52,7 +52,7 @@ Hebrew throughout, casual street slang. Key copy:
 - Tab switcher (כניסה / הרשמה) — active tab filled yellow, inactive transparent
 - Two inputs: phone + password, glassmorphism style, yellow border on focus
 - Primary CTA: full-width yellow gradient button "בוא נשחק 🤙"
-- Forgot password: "קליק כאן אחי" in dim yellow
+- Forgot password: "לחץ כאן , נזכיר לך" in dim yellow
 - Register hint: "פתח חשבון — זה שניה"
 
 ---

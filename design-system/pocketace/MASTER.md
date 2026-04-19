@@ -1,14 +1,16 @@
 # Design System Master File
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
+> **LOGIC:** When building a specific page, first check `design-system/pocketace/pages/[page-name].md`.
 > If that file exists, its rules **override** this Master file.
 > If not, strictly follow the rules below.
 
 ---
 
-**Project:** PocketAce
-**Generated:** 2026-04-18 14:16:56
-**Category:** Airline
+**Project:** PocketAce — Hebrew-language poker game manager
+**Last synced:** 2026-04-19 (hood/crew redesign, branch `feat/ux-ui-redesign`)
+**Category:** Casual Social Gaming / Poker Utility
+**Aesthetic:** Hood · Crew · Street · Glassmorphism on near-black
+**Source of truth:** `src/index.css` (design tokens) + per-screen CSS in `src/styles/`
 
 ---
 
@@ -16,191 +18,289 @@
 
 ### Color Palette
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#1C1917` | `--color-primary` |
-| Secondary | `#44403C` | `--color-secondary` |
-| CTA/Accent | `#CA8A04` | `--color-cta` |
-| Background | `#FAFAF9` | `--color-background` |
-| Text | `#0C0A09` | `--color-text` |
+#### Core tokens (from `src/index.css`)
 
-**Color Notes:** Premium dark + gold accent
+| Role | Hex / rgba | CSS Variable |
+|------|-----------|--------------|
+| Background — primary | `#080810` | `--bg-primary` |
+| Background — secondary | `#0d0d18` | `--bg-secondary` |
+| Background — card | `rgba(255,255,255,0.03)` | `--bg-card` |
+| Background — glass | `rgba(255,255,255,0.04)` | `--bg-glass` |
+| Text — primary | `#ffffff` | `--text-primary` |
+| Text — secondary | `rgba(255,255,255,0.4)` | `--text-secondary` |
+| Text — dim | `rgba(255,255,255,0.15)` | `--text-dim` |
+| Accent — yellow | `#f5c518` | `--yellow` |
+| Accent — yellow dark | `#d4a017` | `--yellow-dark` |
+| Accent — yellow glow | `rgba(245,197,24,0.4)` | `--yellow-glow` |
+| Accent — yellow glass | `rgba(245,197,24,0.1)` | `--yellow-glass` |
+| Accent — yellow border | `rgba(245,197,24,0.3)` | `--yellow-border` |
+| Semantic — win | `#2ecc71` | `--green` |
+| Semantic — loss / danger | `#e74c3c` | `--red` |
+| Border (neutral) | `rgba(255,255,255,0.07)` | `--border` |
+
+**Color notes:** Near-black base (tinted blue, not pure black) + single warm yellow accent for money/CTA/identity. Reds and greens reserved for win/loss semantics only — never decorative.
+
+#### Per-player colors (slot-indexed)
+
+Assigned deterministically by player index (0–5). Used across `GameSetup`, `GameTable`, `EndGame`, `SettlementResults`. **Currently duplicated in 4 components — extract to `src/utils/playerColors.ts` when touched next.**
+
+| Slot | Name | Gradient (bg) | Text | Border | Glow |
+|------|------|---------------|------|--------|------|
+| 0 | Red | `linear-gradient(135deg,#e74c3c,#c0392b)` | `#e74c3c` | `rgba(231,76,60,0.35)` | `rgba(231,76,60,0.45)` |
+| 1 | Blue | `linear-gradient(135deg,#3498db,#2980b9)` | `#3498db` | `rgba(52,152,219,0.35)` | `rgba(52,152,219,0.45)` |
+| 2 | Green | `linear-gradient(135deg,#2ecc71,#27ae60)` | `#2ecc71` | `rgba(46,204,113,0.35)` | `rgba(46,204,113,0.45)` |
+| 3 | Purple | `linear-gradient(135deg,#9b59b6,#8e44ad)` | `#9b59b6` | `rgba(155,89,182,0.35)` | `rgba(155,89,182,0.45)` |
+| 4 | Orange | `linear-gradient(135deg,#ff6b35,#e55a24)` | `#ff6b35` | `rgba(255,107,53,0.35)` | `rgba(255,107,53,0.45)` |
+| 5 | Amber | `linear-gradient(135deg,#f39c12,#d68910)` | `#f39c12` | `rgba(243,156,18,0.35)` | `rgba(243,156,18,0.45)` |
+
+Card background pattern: `linear-gradient(145deg, rgba(COLOR,0.15), rgba(COLOR,0.05))` + 0.35α border + optional 0.45α box-shadow glow for active/hero states.
+
+---
 
 ### Typography
 
-- **Heading Font:** Inter
-- **Body Font:** Inter
-- **Mood:** spatial, legible, glass, system, clean, neutral
-- **Google Fonts:** [Inter + Inter](https://fonts.google.com/share?selection.family=Inter:wght@300;400;500;600)
+- **Primary font:** `Inter` (weights 300–900)
+- **Hebrew fallback:** `Heebo`, `Assistant`
+- **System fallback:** `-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
+- **Direction:** RTL globally (`html { direction: rtl; text-align: right; }`)
+- **Base font-size:** 16px (never shrink below — iOS auto-zoom trap)
+- **Headings:** `font-weight: 700`, `letter-spacing: -0.3px`, no default margin
+- **Mood:** Confident · Street · Casual-poker · Hebrew-first
 
-**CSS Import:**
+**CSS Import (already in `src/styles/fonts.css`):**
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&family=Assistant:wght@400;700&display=swap');
 ```
 
-### Spacing Variables
+---
+
+### Layout & Radius
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Tight gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
-| `--space-md` | `16px` / `1rem` | Standard padding |
-| `--space-lg` | `24px` / `1.5rem` | Section padding |
-| `--space-xl` | `32px` / `2rem` | Large gaps |
-| `--space-2xl` | `48px` / `3rem` | Section margins |
-| `--space-3xl` | `64px` / `4rem` | Hero padding |
+| `--touch` | `48px` | Minimum tap target (buttons, inputs, steppers) |
+| `--radius-sm` | `10px` | Chips, small pills, tight controls |
+| `--radius-md` | `14px` | Buttons, inputs, small cards |
+| `--radius-lg` | `18px` | Main cards, modal bodies |
+| `--radius-xl` | `24px` | Hero elements, pill buttons |
+| `--safe-top/bottom/left/right` | `env(safe-area-inset-*)` | iOS notch / home indicator handling |
 
-### Shadow Depths
+### Shadows
 
-| Level | Value | Usage |
+| Token | Value | Usage |
 |-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+| `--shadow-card` | `0 8px 32px rgba(0,0,0,0.55)` | Every glassmorphism card |
+| `--shadow-yellow` | `0 6px 28px rgba(245,197,24,0.4)` | Primary CTA glow |
+
+(No full shadow-sm/md/lg/xl scale — this is a dark-UI single-elevation system.)
 
 ---
 
 ## Component Specs
 
-### Buttons
+### Glassmorphism Card (core pattern)
 
 ```css
-/* Primary Button */
-.btn-primary {
-  background: #CA8A04;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-/* Secondary Button */
-.btn-secondary {
-  background: transparent;
-  color: #1C1917;
-  border: 2px solid #1C1917;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--yellow-border);
+  border-radius: var(--radius-lg);
 }
 ```
 
-### Cards
+For player-colored cards, swap the background/border to the slot color's gradient + 0.35α border.
+
+### Buttons
 
 ```css
-.card {
-  background: #FAFAF9;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
+/* Global base — applies to every <button> */
+button {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
+  border: none;
+  border-radius: var(--radius-md);
+  min-height: var(--touch);
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.12s, transform 0.1s;
+}
+button:active:not(:disabled) { opacity: 0.82; }
+button:disabled              { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+/* Primary CTA */
+.btn-primary {
+  background: linear-gradient(135deg, var(--yellow), var(--yellow-dark));
+  color: #080810;
+  box-shadow: var(--shadow-yellow);
 }
 
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+/* Ghost / secondary */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
 }
 ```
 
 ### Inputs
 
 ```css
-.input {
-  padding: 12px 16px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
+input, textarea, select {
+  direction: rtl;
+  text-align: right;
+  font-family: inherit;
   font-size: 16px;
-  transition: border-color 200ms ease;
+  min-height: var(--touch);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-
-.input:focus {
-  border-color: #1C1917;
-  outline: none;
-  box-shadow: 0 0 0 3px #1C191720;
+input:focus {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.14);
 }
+input::placeholder { color: var(--text-dim); }
 ```
 
 ### Modals
 
+Dark glass overlay + card stacked on near-black. See `src/components/modals/modals.css` for the current implementation.
+
 ```css
 .modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
 }
-
 .modal {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: var(--shadow-xl);
-  max-width: 500px;
-  width: 90%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--yellow-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+  max-width: 440px;
+  width: calc(100% - 32px);
 }
+```
+
+### Scroll containers
+
+```css
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
 ```
 
 ---
 
-## Style Guidelines
+## Motion
 
-**Style:** Exaggerated Minimalism
+All screen-level transitions use **Framer Motion**. Required for:
+- Every phase transition (`AnimatePresence` + `motion.div`)
+- Modal open/close (scale + fade, 150–300ms)
+- Number counters (animate on value change)
+- Success / win states (confetti + bounce-in)
 
-**Keywords:** Bold minimalism, oversized typography, high contrast, negative space, loud minimal, statement design
+**Standard screen entrance:**
+```ts
+const screenVariants = {
+  initial: { opacity: 0, y: 24 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+  exit:    { opacity: 0, y: -24, transition: { duration: 0.2 } }
+};
+```
 
-**Best For:** Fashion, architecture, portfolios, agency landing pages, luxury brands, editorial
+**Keyframe utilities** (in `src/index.css`): `pulse-glow`, `float`, `slideUp`, `fadeIn`, `spin`, `bounce-in`.
 
-**Key Effects:** font-size: clamp(3rem 10vw 12rem), font-weight: 900, letter-spacing: -0.05em, massive whitespace
+Always respect `prefers-reduced-motion` — wrap variants conditionally on `useReducedMotion()`.
 
-### Page Pattern
+---
 
-**Pattern Name:** Horizontal Scroll Journey
+## Voice & Tone
 
-- **Conversion Strategy:** Immersive product discovery. High engagement. Keep navigation visible.
-28,Bento Grid Showcase,bento,  grid,  features,  modular,  apple-style,  showcase", 1. Hero, 2. Bento Grid (Key Features), 3. Detail Cards, 4. Tech Specs, 5. CTA, Floating Action Button or Bottom of Grid, Card backgrounds: #F5F5F7 or Glass. Icons: Vibrant brand colors. Text: Dark., Hover card scale (1.02), video inside cards, tilt effect, staggered reveal, Scannable value props. High information density without clutter. Mobile stack.
-29,Interactive 3D Configurator,3d,  configurator,  customizer,  interactive,  product", 1. Hero (Configurator), 2. Feature Highlight (synced), 3. Price/Specs, 4. Purchase, Inside Configurator UI + Sticky Bottom Bar, Neutral studio background. Product: Realistic materials. UI: Minimal overlay., Real-time rendering, material swap animation, camera rotate/zoom, light reflection, Increases ownership feeling. 360 view reduces return rates. Direct add-to-cart.
-30,AI-Driven Dynamic Landing,ai,  dynamic,  personalized,  adaptive,  generative", 1. Prompt/Input Hero, 2. Generated Result Preview, 3. How it Works, 4. Value Prop, Input Field (Hero) + 'Try it' Buttons, Adaptive to user input. Dark mode for compute feel. Neon accents., Typing text effects, shimmering generation loaders, morphing layouts, Immediate value demonstration. 'Show, don't tell'. Low friction start.
-- **CTA Placement:** Floating Sticky CTA or End of Horizontal Track
-- **Section Order:** 1. Intro (Vertical), 2. The Journey (Horizontal Track), 3. Detail Reveal, 4. Vertical Footer
+Hebrew throughout, **casual street slang**, poker-flavored.
+
+| Context | Copy pattern |
+|---------|--------------|
+| Primary CTA | "בוא נשחק 🤙", "פותחים שולחן 🃏", "יאללה, מתחילים! 🚀" |
+| End game | "חשב מי חייב למי 🧮" |
+| Winner | "כריש 🦈", "שחיטה טהורה 💰" |
+| Loser | "תרומה לקהילה 🐟", "דג של הערב" |
+| Forgot password | "קליק כאן אחי" |
+| Register | "פתח חשבון — זה שניה" |
+| Play again | "משחק נוסף? יאללה 🃏" |
+| Tagline | "תן לקלפים לדבר בשבילך ♠" |
+
+**Emoji policy:** Emojis are a **core brand element** here — they carry the hood/crew tone. Use them in copy, avatars, and badges. Do NOT replace them with SVG icons.
+
+---
+
+## Player Emojis (avatar pool)
+
+```ts
+const PLAYER_EMOJIS = ['🤙', '😎', '🦈', '🤑', '😈', '🃏'];
+```
+
+Assigned by slot index in parallel with `PLAYER_COLORS`.
+
+---
+
+## Layout Pattern
+
+**Fullscreen phase-based flow** — no persistent nav bar, no tabs. Each phase (`AUTH → LOBBY → SETUP → TABLE → END_GAME → RESULTS`) owns the full viewport. Phase transitions are driven from `App.tsx` via callback props.
+
+- Header bar: fixed top, respects `--safe-top`
+- Content: `.scroll-area` with hidden scrollbar
+- Bottom CTA bar: fixed, respects `--safe-bottom`
 
 ---
 
 ## Anti-Patterns (Do NOT Use)
 
-- ❌ Complex booking
-- ❌ Poor mobile
-
-### Additional Forbidden Patterns
-
-- ❌ **Emojis as icons** — Use SVG icons (Heroicons, Lucide, Simple Icons)
-- ❌ **Missing cursor:pointer** — All clickable elements must have cursor:pointer
-- ❌ **Layout-shifting hovers** — Avoid scale transforms that shift layout
-- ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
-- ❌ **Instant state changes** — Always use transitions (150-300ms)
-- ❌ **Invisible focus states** — Focus states must be visible for a11y
+- ❌ **Pure black `#000` backgrounds** — use `#080810` (tinted)
+- ❌ **Bright white cards** — everything sits on dark
+- ❌ **Multiple accent colors** — yellow is the only CTA color; red/green are semantic only
+- ❌ **Tap targets under 48px** — breaks one-handed play
+- ❌ **Hover-only interactions** — this is a phone-first app
+- ❌ **Skipping the Framer Motion entrance** — every screen must animate in
+- ❌ **Hardcoded colors in components** — reference CSS vars from `index.css` or the `PLAYER_COLORS` table
+- ❌ **Floating `process.env.*`** — use `import.meta.env.VITE_*` (Vite)
+- ❌ **Low contrast text on dark glass** — maintain 4.5:1 minimum
+- ❌ **Instant state changes** — always 150–300ms transitions
+- ❌ **Replacing emojis with SVG icons** — emojis are intentional brand voice
 
 ---
 
 ## Pre-Delivery Checklist
 
-Before delivering any UI code, verify:
+Before shipping any UI code, verify:
 
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] `cursor-pointer` on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard navigation
-- [ ] `prefers-reduced-motion` respected
-- [ ] Responsive: 375px, 768px, 1024px, 1440px
-- [ ] No content hidden behind fixed navbars
-- [ ] No horizontal scroll on mobile
+- [ ] All colors reference `var(--*)` from `src/index.css` (no raw hex)
+- [ ] Every button has `min-height: var(--touch)` (48px)
+- [ ] Every input has `font-size: 16px` (prevents iOS auto-zoom)
+- [ ] RTL respected: `margin-inline` instead of `margin-left/right` where possible
+- [ ] Framer Motion entrance on screen mount
+- [ ] `prefers-reduced-motion` branch present for animations
+- [ ] Responsive: tested 375px, 390px, 414px, 430px widths (no desktop-first)
+- [ ] Safe-area insets on any fixed top/bottom bar
+- [ ] No hardcoded `#000` or `#fff` — use tokens
+- [ ] Hebrew copy reviewed for street-tone consistency
+- [ ] Every clickable has `cursor: pointer`
+- [ ] Focus states visible for keyboard (yellow border + 3px soft glow)

@@ -7,7 +7,6 @@ const REGISTRATION_LOG_KEY = 'pocketAce_registrationLog';
 const VERIFICATION_CODE_KEY = 'pocketAce_verificationCode';
 const VERIFICATION_PHONE_KEY = 'pocketAce_verificationPhone';
 const VERIFICATION_NAME_KEY = 'pocketAce_verificationName';
-const INITIAL_CREDITS = 3;
 const MAX_ACCOUNTS_PER_DEVICE = 1;
 const REGISTRATION_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours
 const VERIFICATION_CODE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
@@ -248,7 +247,6 @@ export const verifyCodeAndRegister = (enteredCode: string): { user: User | null;
         id: userId,
         name: name,
         phone: phone,
-        credits: INITIAL_CREDITS,
         createdAt: Date.now()
       };
 
@@ -336,36 +334,6 @@ export const logoutUser = () => {
   localStorage.removeItem(STORAGE_KEY);
 };
 
-/**
- * Update user credits
- */
-export const updateUserCredits = (userId: string, credits: number) => {
-  const users = getAllUsers();
-  if (users[userId]) {
-    users[userId].credits = credits;
-    saveUsers(users);
-
-    // Update current user if same
-    const current = getCurrentUser();
-    if (current?.id === userId) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(users[userId]));
-    }
-  }
-};
-
-/**
- * Decrement credit for current user
- */
-export const decrementCredits = (): boolean => {
-  const user = getCurrentUser();
-  if (!user) return false;
-
-  if (user.credits <= 0) return false;
-
-  const newCredits = user.credits - 1;
-  updateUserCredits(user.id, newCredits);
-  return true;
-};
 
 /**
  * Check if user is authenticated

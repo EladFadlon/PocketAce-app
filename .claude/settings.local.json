@@ -4,7 +4,13 @@
       "Bash(npm run *)",
       "Bash(python3 /Users/macbookpro/.claude/skills/ui-ux-pro-max/scripts/search.py \"mobile poker game friends group hood urban dark glassmorphism\" --design-system --persist -p \"PocketAce\" -f markdown)",
       "Bash(python3 /Users/macbookpro/.claude/skills/ui-ux-pro-max/scripts/search.py \"glassmorphism dark neon urban\" --domain style -n 3)",
-      "Bash(python3 /Users/macbookpro/.claude/skills/ui-ux-pro-max/scripts/search.py \"animation touch mobile\" --domain ux -n 5)"
+      "Bash(python3 /Users/macbookpro/.claude/skills/ui-ux-pro-max/scripts/search.py \"animation touch mobile\" --domain ux -n 5)",
+      "Bash(sed -i '' 's/var\\(--gold\\)/var\\(--yellow\\)/g' src/index.css)",
+      "Bash(sed -i '' 's/var\\(--border-gold\\)/var\\(--yellow-border\\)/g' src/index.css)",
+      "Bash(sed -i '' 's/var\\(--gold-glow\\)/var\\(--yellow-glow\\)/g' src/index.css)",
+      "Bash(npx tsc *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }
