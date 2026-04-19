@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { User, GameRecord } from '../types';
 import { getRecentGames, calculateCumulativeProfitLoss, getCumulativeStatus } from '../utils/gameHistory';
-import { showModal } from './modals';
 import '../styles/lobby.css';
 
 interface LobbyProps {
   onStartGame: () => void;
   user: User;
   onLogout: () => void;
-  onCreditsUpdate: (additionalCredits: number) => void;
+  isPremium: boolean;
+  onPremiumChange: (value: boolean) => void;
 }
 
-export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, onCreditsUpdate }) => {
+export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPremium, onPremiumChange }) => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [recentGames, setRecentGames] = useState<GameRecord[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameRecord | null>(null);
@@ -37,6 +37,18 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, onCre
   const CREW_SHADOWS = ['rgba(231,76,60,0.4)', 'rgba(52,152,219,0.4)', 'rgba(46,204,113,0.4)'];
   const CREW_EMOJIS = ['🤙', '😎', '🦈'];
 
+  const handlePurchase = async () => {
+    const { purchaseRemoveAds } = await import('../utils/purchases');
+    const success = await purchaseRemoveAds();
+    if (success) onPremiumChange(true);
+  };
+
+  const handleRestore = async () => {
+    const { restorePurchases } = await import('../utils/purchases');
+    const wasPremium = await restorePurchases();
+    if (wasPremium) onPremiumChange(true);
+  };
+
   return (
     <div className="lobby-screen">
       {/* Top bar */}
@@ -47,11 +59,6 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, onCre
             <div className="lobby-greeting-label">שלום,</div>
             <div className="lobby-greeting-name">{firstName} 🤙</div>
           </div>
-        </div>
-        <div className="lobby-credits-pill">
-          <span>⚡</span>
-          <span>{user.credits}</span>
-          <small>קרדיטים</small>
         </div>
       </div>
 
@@ -104,7 +111,6 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, onCre
           <motion.button className="lobby-cta" onClick={onStartGame} whileTap={{ scale: 0.97 }}>
             <span>⚡</span><span>פותחים שולחן</span><span>🃏</span>
           </motion.button>
-          <div className="lobby-cta-sub">עולה קרדיט אחד</div>
         </div>
 
         {/* Recent games */}
@@ -136,18 +142,25 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, onCre
           </div>
         )}
 
-        {/* Store teaser */}
-        <div className="lobby-store-teaser">
-          <div>
-            <div className="lobby-store-title">⚡ נגמרו הקרדיטים?</div>
-            <div className="lobby-store-sub">קנה חבילה ושחק עוד</div>
+        {/* Premium / Remove Ads */}
+        {!isPremium && (
+          <div className="lobby-premium-section">
+            <motion.button
+              className="lobby-premium-btn"
+              onClick={handlePurchase}
+              whileTap={{ scale: 0.97 }}
+            >
+              בלי פרסומות. רק פוקר. ♠
+            </motion.button>
+            <button className="lobby-restore-btn" onClick={handleRestore}>
+              שחזר רכישה
+            </button>
           </div>
-          <button
-            className="lobby-store-btn"
-            onClick={() => showModal({ type: 'store', data: { onPurchase: onCreditsUpdate } })}
-          >חנות</button>
-        </div>
+        )}
       </div>
+
+      {/* Ad banner placeholder — AdMob injects the real banner via native overlay */}
+      {!isPremium && <div className="lobby-ad-banner" />}
 
       {/* Logout */}
       <div className="lobby-logout">
@@ -212,7 +225,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, onCre
             >
               <button onClick={() => setShowWelcome(false)} style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.06)', border: 'none', width: 32, height: 32, borderRadius: '50%', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 16 }}>✕</button>
               <h2 style={{ fontSize: 18, fontWeight: 900, margin: '0 0 8px' }}>ברוכים הבאים ל-Pocket Ace ♠</h2>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 20px' }}>כל משחק עולה קרדיט אחד. הקרדיט ינוכה רק כשהמשחק מתחיל. 💎</p>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 20px' }}>נהל את משחקי הפוקר שלך בקלות. מי חייב למי — ב-10 שניות. 🃏</p>
               <button
                 onClick={() => setShowWelcome(false)}
                 style={{ width: '100%', background: 'linear-gradient(135deg,var(--yellow),var(--yellow-dark))', color: '#111', border: 'none', padding: 14, borderRadius: 14, fontSize: 15, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}

@@ -254,3 +254,43 @@
 }
 
 .lobby-sheet-title { font-size: 18px; font-weight: 900; margin: 0 0 16px; }
+
+/* Premium / Remove Ads */
+.lobby-premium-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px 8px;
+}
+
+.lobby-premium-btn {
+  width: 100%;
+  background: rgba(245, 197, 24, 0.08);
+  border: 1px solid rgba(245, 197, 24, 0.25);
+  color: var(--yellow);
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+}
+
+.lobby-restore-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  text-decoration: underline;
+}
+
+/* Space reserved at the bottom for the AdMob native banner overlay */
+.lobby-ad-banner {
+  height: 60px;
+  flex-shrink: 0;
+}

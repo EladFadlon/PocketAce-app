@@ -8,10 +8,8 @@ import { GameTable } from './components/GameTable';
 import { EndGame } from './components/EndGame';
 import { SettlementResults } from './components/SettlementResults';
 import { calculatePlayerSettlements, minimizeDebts } from './utils/settlements';
-import { getCurrentUser, updateUserCredits, logoutUser } from './utils/auth';
+import { getCurrentUser, logoutUser } from './utils/auth';
 import { saveGameRecord } from './utils/gameHistory';
-import { hasReceivedWelcomeGift, markWelcomeGiftReceived } from './utils/credits';
-import { ModalManager, showModal } from './components/modals';
 import './App.css';
 
 const GAME_SAVE_KEY = 'pocketAce_currentGame';
@@ -24,24 +22,12 @@ function App() {
   const [settlements, setSettlements] = useState<PlayerSettlement[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
   const [hostFee, setHostFee] = useState(0);
+  const [isPremium, setIsPremium] = useState(false);
 
-  const grantWelcomeGift = useCallback((user: User) => {
-    if (hasReceivedWelcomeGift(user.id)) return user;
-    const welcomeCredits = 50;
-    const newCredits = user.credits + welcomeCredits;
-    updateUserCredits(user.id, newCredits);
-    markWelcomeGiftReceived(user.id);
-    showModal({ type: 'welcomeGift', data: { credits: welcomeCredits } });
-    return { ...user, credits: newCredits };
-  }, []);
-
-  // On mount: restore session and in-progress game
   useEffect(() => {
     const user = getCurrentUser();
     if (!user) return;
-
-    const updatedUser = grantWelcomeGift(user);
-    setCurrentUser(updatedUser);
+    setCurrentUser(user);
 
     try {
       const saved = localStorage.getItem(GAME_SAVE_KEY);
@@ -59,7 +45,6 @@ function App() {
     setPhase(GamePhaseEnum.LOBBY);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Persist active game state so a refresh can resume
   useEffect(() => {
     if (phase === GamePhaseEnum.TABLE || phase === GamePhaseEnum.END_GAME) {
       localStorage.setItem(GAME_SAVE_KEY, JSON.stringify({ phase, players, settings }));
@@ -69,10 +54,9 @@ function App() {
   }, [phase, players, settings]);
 
   const handleAuthSuccess = useCallback((user: User) => {
-    const updatedUser = grantWelcomeGift(user);
-    setCurrentUser(updatedUser);
+    setCurrentUser(user);
     setPhase(GamePhaseEnum.LOBBY);
-  }, [grantWelcomeGift]);
+  }, []);
 
   const handleLogout = useCallback(() => {
     logoutUser();
@@ -81,64 +65,28 @@ function App() {
     setPhase(GamePhaseEnum.AUTH);
   }, []);
 
-  const handleCreditsUpdate = useCallback((additionalCredits: number) => {
-    setCurrentUser(prev => {
-      if (!prev) return null;
-      const newCredits = prev.credits + additionalCredits;
-      updateUserCredits(prev.id, newCredits);
-      return { ...prev, credits: newCredits };
-    });
-  }, []);
-
-  // LOBBY → SETUP: show confirmation modal, credit NOT yet deducted
   const handleStartFromLobby = useCallback(() => {
     if (!currentUser) return;
+    const hostPlayer: Player = {
+      id: `host_${currentUser.id}`,
+      name: currentUser.name,
+      buyIns: 1,
+      totalInvested: settings.nisPerBuyIn,
+      finalChips: settings.chipsPerBuyIn,
+      isHost: true,
+    };
+    setPlayers([hostPlayer]);
+    setSettlements([]);
+    setDebts([]);
+    setHostFee(0);
+    setPhase(GamePhaseEnum.SETUP);
+  }, [currentUser, settings]);
 
-    if (currentUser.credits <= 0) {
-      showModal({
-        type: 'gameOver',
-        data: {
-          onShop: () => showModal({ type: 'store', data: { onPurchase: handleCreditsUpdate } })
-        }
-      });
-      return;
-    }
-
-    showModal({
-      type: 'creditConfirmation',
-      data: {
-        creditsRemaining: currentUser.credits,
-        onConfirm: () => {
-          const hostPlayer: Player = {
-            id: `host_${currentUser.id}`,
-            name: currentUser.name,
-            buyIns: 1,
-            totalInvested: settings.nisPerBuyIn,
-            finalChips: settings.chipsPerBuyIn,
-            isHost: true,
-          };
-          setPlayers([hostPlayer]);
-          setSettlements([]);
-          setDebts([]);
-          setHostFee(0);
-          setPhase(GamePhaseEnum.SETUP);
-        }
-      }
-    });
-  }, [currentUser, settings, handleCreditsUpdate]);
-
-  // SETUP → TABLE: deduct credit at the true point of no return
   const handleStartGame = useCallback((newSettings: GameSettings, newPlayers: Player[]) => {
-    if (!currentUser) return;
-
-    const newCredits = currentUser.credits - 1;
-    updateUserCredits(currentUser.id, newCredits);
-    setCurrentUser(prev => prev ? { ...prev, credits: newCredits } : null);
-
     setSettings(newSettings);
     setPlayers(newPlayers);
     setPhase(GamePhaseEnum.TABLE);
-  }, [currentUser]);
+  }, []);
 
   const handleAddBuyIn = useCallback((playerId: string) => {
     setPlayers(prev =>
@@ -170,7 +118,7 @@ function App() {
     setPhase(GamePhaseEnum.RESULTS);
   }, [players, settings, currentUser]);
 
-  const handlePlayAgain = useCallback(() => {
+  const resetToLobby = useCallback(() => {
     setPhase(GamePhaseEnum.LOBBY);
     setPlayers([]);
     setSettlements([]);
@@ -178,15 +126,6 @@ function App() {
     setHostFee(0);
   }, []);
 
-  const handleGoHome = useCallback(() => {
-    setPhase(GamePhaseEnum.LOBBY);
-    setPlayers([]);
-    setSettlements([]);
-    setDebts([]);
-    setHostFee(0);
-  }, []);
-
-  // Quit from TABLE: credit already spent, return to lobby
   const handleQuit = useCallback(() => {
     localStorage.removeItem(GAME_SAVE_KEY);
     setPhase(GamePhaseEnum.LOBBY);
@@ -204,12 +143,13 @@ function App() {
           onStartGame={handleStartFromLobby}
           user={currentUser}
           onLogout={handleLogout}
-          onCreditsUpdate={handleCreditsUpdate}
+          isPremium={isPremium}
+          onPremiumChange={setIsPremium}
         />
       )}
 
       {phase === GamePhaseEnum.SETUP && currentUser && (
-        <GameSetup onStartGame={handleStartGame} onHome={handleGoHome} existingPlayers={players} />
+        <GameSetup onStartGame={handleStartGame} onHome={resetToLobby} existingPlayers={players} />
       )}
 
       {phase === GamePhaseEnum.TABLE && (
@@ -219,7 +159,7 @@ function App() {
           onAddBuyIn={handleAddBuyIn}
           onEndGame={handleEndGame}
           onQuit={handleQuit}
-          onHome={handleGoHome}
+          onHome={resetToLobby}
         />
       )}
 
@@ -229,7 +169,7 @@ function App() {
           settings={settings}
           onCalculate={handleCalculateSettlements}
           onBack={handleBackFromEndGame}
-          onHome={handleGoHome}
+          onHome={resetToLobby}
         />
       )}
 
@@ -239,13 +179,11 @@ function App() {
           debts={debts}
           gameSettings={settings}
           hostFee={hostFee}
-          onPlayAgain={handlePlayAgain}
-          onHome={handleGoHome}
+          onPlayAgain={resetToLobby}
+          onHome={resetToLobby}
           user={currentUser}
         />
       )}
-
-      <ModalManager />
     </div>
   );
 }
