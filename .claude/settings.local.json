@@ -14,7 +14,10 @@
       "Bash(npm install *)",
       "Bash(sudo chown *)",
       "Bash(npm cache *)",
-      "Bash(npx cap *)"
+      "Bash(npx cap *)",
+      "Bash(node -e \"const pkg = require\\('./package.json'\\); console.log\\('capacitor/core version:', pkg.dependencies['@capacitor/core']\\); console.log\\('capacitor/ios version:', pkg.dependencies['@capacitor/ios']\\); console.log\\('capacitor/android version:', pkg.dependencies['@capacitor/android']\\); console.log\\('capacitor/cli version:', pkg.devDependencies['@capacitor/cli']\\);\")",
+      "Bash(node -e \"const lock = require\\('./package-lock.json'\\); const core = lock.packages['node_modules/@capacitor/core']; console.log\\('Resolved @capacitor/core:', core?.version\\)\")",
+      "Bash(npm info *)"
     ]
   }
 }

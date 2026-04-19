@@ -28,7 +28,7 @@ export const showBannerAd = async (): Promise<void> => {
   if (!isNative()) return;
   const options: BannerAdOptions = {
     adId: isIos() ? TEST_BANNER_IOS : TEST_BANNER_ANDROID,
-    adSize: BannerAdSize.BANNER,
+    adSize: BannerAdSize.ADAPTIVE_BANNER,
     position: BannerAdPosition.BOTTOM_CENTER,
     margin: 0,
     isTesting: true,
@@ -48,10 +48,14 @@ export const removeBannerAd = async (): Promise<void> => {
 
 export const showInterstitialAd = async (): Promise<void> => {
   if (!isNative()) return;
-  const options: AdOptions = {
-    adId: isIos() ? TEST_INTERSTITIAL_IOS : TEST_INTERSTITIAL_ANDROID,
-    isTesting: true,
-  };
-  await AdMob.prepareInterstitial(options);
-  await AdMob.showInterstitial();
+  try {
+    const options: AdOptions = {
+      adId: isIos() ? TEST_INTERSTITIAL_IOS : TEST_INTERSTITIAL_ANDROID,
+      isTesting: true,
+    };
+    await AdMob.prepareInterstitial(options);
+    await AdMob.showInterstitial();
+  } catch {
+    // Ad failed to load or show — continue silently so user is never stuck
+  }
 };

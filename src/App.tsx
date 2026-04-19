@@ -80,6 +80,7 @@ function App() {
   const handleLogout = useCallback(() => {
     logoutUser();
     localStorage.removeItem(GAME_SAVE_KEY);
+    localStorage.removeItem('pocketAce_isPremium');
     setCurrentUser(null);
     setIsPremium(false);
     setPhase(GamePhaseEnum.AUTH);
