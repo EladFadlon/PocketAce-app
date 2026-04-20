@@ -12,7 +12,7 @@ interface LobbyProps {
   onPremiumChange: (value: boolean) => void;
 }
 
-export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPremium, onPremiumChange: _onPremiumChange }) => {
+export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPremium, onPremiumChange }) => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [recentGames, setRecentGames] = useState<GameRecord[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameRecord | null>(null);
@@ -41,8 +41,14 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
   const CREW_EMOJIS = ['🤙', '😎', '🦈'];
 
   // no-op stubs — web monetization not yet implemented
-  const handlePurchase = () => { /* future web monetization hook */ };
-  const handleRestore = () => { /* future web monetization hook */ };
+  const handlePurchase = () => {
+    // TODO: web monetization — call onPremiumChange(true) on success
+    void onPremiumChange; // Mark as used
+  };
+  const handleRestore = () => {
+    // TODO: web monetization — call onPremiumChange(true) on success
+    void onPremiumChange; // Mark as used
+  };
 
   return (
     <div className="lobby-screen">
@@ -151,7 +157,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
         )}
       </div>
 
-      {/* Ad banner placeholder — AdMob injects the real banner via native overlay */}
+      {/* Reserved layout space for future web ad banner */}
       {!isPremium && <div className="lobby-ad-banner" />}
 
       {/* Logout */}

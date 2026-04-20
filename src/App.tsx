@@ -23,6 +23,7 @@ function App() {
   const [settlements, setSettlements] = useState<PlayerSettlement[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
   const [hostFee, setHostFee] = useState(0);
+  // TODO: web monetization — set via onPremiumChange once a payment provider is wired in
   const [isPremium, setIsPremium] = useState(() => localStorage.getItem('pocketAce_isPremium') === 'true');
 
   const handlePremiumChange = useCallback((value: boolean) => {
