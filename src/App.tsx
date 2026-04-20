@@ -64,6 +64,7 @@ function App() {
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[auth]', event, session?.user?.email ?? null);
       if (!mounted) return;
       if (event === 'INITIAL_SESSION') {
         if (session) handleSession(session);
