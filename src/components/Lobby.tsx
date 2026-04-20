@@ -23,6 +23,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
   useEffect(() => {
     const hasVisited = localStorage.getItem('pocketAceVisited');
     if (!hasVisited) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowWelcome(true);
       localStorage.setItem('pocketAceVisited', 'true');
     }

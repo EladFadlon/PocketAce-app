@@ -36,6 +36,7 @@ function App() {
   useEffect(() => {
     const user = getCurrentUser();
     if (!user) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentUser(user);
 
     initializePurchases(user.id).then(() => {
@@ -61,12 +62,12 @@ function App() {
     } catch { /* fall through to lobby */ }
 
     setPhase(GamePhaseEnum.LOBBY);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (phase === GamePhaseEnum.TABLE || phase === GamePhaseEnum.END_GAME) {
       localStorage.setItem(GAME_SAVE_KEY, JSON.stringify({ phase, players, settings }));
-    } else if ([GamePhaseEnum.LOBBY, GamePhaseEnum.RESULTS, GamePhaseEnum.AUTH].includes(phase as any)) {
+    } else if (([GamePhaseEnum.LOBBY, GamePhaseEnum.RESULTS, GamePhaseEnum.AUTH] as string[]).includes(phase)) {
       localStorage.removeItem(GAME_SAVE_KEY);
     }
   }, [phase, players, settings]);

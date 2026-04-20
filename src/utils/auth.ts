@@ -49,7 +49,7 @@ const getDeviceId = (): string => {
  */
 const isValidPhone = (phone: string): boolean => {
   // Accept formats: +1234567890, +1-234-567-8900, 0512345678, etc.
-  const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,4}[-\s\.]?[0-9]{1,9}$/;
+  const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/;
   return phoneRegex.test(phone.replace(/\s/g, ''));
 };
 

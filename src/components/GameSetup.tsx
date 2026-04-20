@@ -28,6 +28,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, onHome, exist
   useEffect(() => {
     // Initialize with existing players (e.g., auto-added host)
     if (existingPlayers.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPlayers(existingPlayers);
     }
   }, [existingPlayers]);
