@@ -37,11 +37,9 @@ function App() {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted || !session) return;
+    const handleSession = (session: Parameters<typeof sessionToUser>[0]) => {
       const user = sessionToUser(session);
       setCurrentUser(user);
-
       initializePurchases(user.id).then(() => {
         checkPremiumStatus().then(premium => {
           if (premium && mounted) {
@@ -50,7 +48,6 @@ function App() {
           }
         });
       });
-
       try {
         const saved = localStorage.getItem(GAME_SAVE_KEY);
         if (saved) {
@@ -63,13 +60,14 @@ function App() {
           }
         }
       } catch { /* fall through to lobby */ }
-
       if (mounted) setPhase(GamePhaseEnum.LOBBY);
-    });
+    };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
-      if (event === 'SIGNED_IN' && session) {
+      if (event === 'INITIAL_SESSION') {
+        if (session) handleSession(session);
+      } else if (event === 'SIGNED_IN' && session) {
         const user = sessionToUser(session);
         setCurrentUser(user);
         setPhase(prev => prev === GamePhaseEnum.AUTH ? GamePhaseEnum.LOBBY : prev);
