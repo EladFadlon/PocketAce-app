@@ -23,6 +23,13 @@ function App() {
   const [settlements, setSettlements] = useState<PlayerSettlement[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
   const [hostFee, setHostFee] = useState(0);
+  const [isPremium, setIsPremium] = useState(() => localStorage.getItem('pocketAce_isPremium') === 'true');
+
+  const handlePremiumChange = useCallback((value: boolean) => {
+    setIsPremium(value);
+    if (value) localStorage.setItem('pocketAce_isPremium', 'true');
+    else localStorage.removeItem('pocketAce_isPremium');
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -77,6 +84,7 @@ function App() {
   const handleLogout = useCallback(async () => {
     await signOut();
     localStorage.removeItem(GAME_SAVE_KEY);
+    localStorage.removeItem('pocketAce_isPremium');
     setCurrentUser(null);
     setPhase(GamePhaseEnum.AUTH);
   }, []);
@@ -157,6 +165,8 @@ function App() {
           onStartGame={handleStartFromLobby}
           user={currentUser}
           onLogout={handleLogout}
+          isPremium={isPremium}
+          onPremiumChange={handlePremiumChange}
         />
       )}
 

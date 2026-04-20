@@ -8,9 +8,11 @@ interface LobbyProps {
   onStartGame: () => void;
   user: User;
   onLogout: () => void;
+  isPremium: boolean;
+  onPremiumChange: (value: boolean) => void;
 }
 
-export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout }) => {
+export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPremium, onPremiumChange: _onPremiumChange }) => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [recentGames, setRecentGames] = useState<GameRecord[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameRecord | null>(null);
@@ -37,6 +39,10 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout }) => 
   const CREW_COLORS = ['linear-gradient(135deg,#e74c3c,#c0392b)', 'linear-gradient(135deg,#3498db,#2980b9)', 'linear-gradient(135deg,#2ecc71,#27ae60)'];
   const CREW_SHADOWS = ['rgba(231,76,60,0.4)', 'rgba(52,152,219,0.4)', 'rgba(46,204,113,0.4)'];
   const CREW_EMOJIS = ['🤙', '😎', '🦈'];
+
+  // no-op stubs — web monetization not yet implemented
+  const handlePurchase = () => { /* future web monetization hook */ };
+  const handleRestore = () => { /* future web monetization hook */ };
 
   return (
     <div className="lobby-screen">
@@ -128,7 +134,25 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout }) => 
           </div>
         )}
 
+        {/* Premium / Remove Ads */}
+        {!isPremium && (
+          <div className="lobby-premium-section">
+            <motion.button
+              className="lobby-premium-btn"
+              onClick={handlePurchase}
+              whileTap={{ scale: 0.97 }}
+            >
+              בלי פרסומות. רק פוקר. ♠
+            </motion.button>
+            <button className="lobby-restore-btn" onClick={handleRestore}>
+              שחזר רכישה
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Ad banner placeholder — AdMob injects the real banner via native overlay */}
+      {!isPremium && <div className="lobby-ad-banner" />}
 
       {/* Logout */}
       <div className="lobby-logout">
