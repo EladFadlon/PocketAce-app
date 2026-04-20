@@ -30,6 +30,7 @@ function App() {
   const handlePremiumChange = useCallback((value: boolean) => {
     setIsPremium(value);
     if (value) localStorage.setItem('pocketAce_isPremium', 'true');
+    else localStorage.removeItem('pocketAce_isPremium');
   }, []);
 
   useEffect(() => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { User, GameRecord } from '../types';
 import { getRecentGames, calculateCumulativeProfitLoss, getCumulativeStatus } from '../utils/gameHistory';
+import { purchaseRemoveAds, restorePurchases } from '../utils/purchases';
 import '../styles/lobby.css';
 
 interface LobbyProps {
@@ -40,13 +41,11 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
   const CREW_EMOJIS = ['🤙', '😎', '🦈'];
 
   const handlePurchase = async () => {
-    const { purchaseRemoveAds } = await import('../utils/purchases');
     const success = await purchaseRemoveAds();
     if (success) onPremiumChange(true);
   };
 
   const handleRestore = async () => {
-    const { restorePurchases } = await import('../utils/purchases');
     const wasPremium = await restorePurchases();
     if (wasPremium) onPremiumChange(true);
   };
