@@ -2,18 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { User, GameRecord } from '../types';
 import { getRecentGames, calculateCumulativeProfitLoss, getCumulativeStatus } from '../utils/gameHistory';
-import { purchaseRemoveAds, restorePurchases } from '../utils/purchases';
 import '../styles/lobby.css';
 
 interface LobbyProps {
   onStartGame: () => void;
   user: User;
   onLogout: () => void;
-  isPremium: boolean;
-  onPremiumChange: (value: boolean) => void;
 }
 
-export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPremium, onPremiumChange }) => {
+export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout }) => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [recentGames, setRecentGames] = useState<GameRecord[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameRecord | null>(null);
@@ -40,16 +37,6 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
   const CREW_COLORS = ['linear-gradient(135deg,#e74c3c,#c0392b)', 'linear-gradient(135deg,#3498db,#2980b9)', 'linear-gradient(135deg,#2ecc71,#27ae60)'];
   const CREW_SHADOWS = ['rgba(231,76,60,0.4)', 'rgba(52,152,219,0.4)', 'rgba(46,204,113,0.4)'];
   const CREW_EMOJIS = ['🤙', '😎', '🦈'];
-
-  const handlePurchase = async () => {
-    const success = await purchaseRemoveAds();
-    if (success) onPremiumChange(true);
-  };
-
-  const handleRestore = async () => {
-    const wasPremium = await restorePurchases();
-    if (wasPremium) onPremiumChange(true);
-  };
 
   return (
     <div className="lobby-screen">
@@ -141,25 +128,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
           </div>
         )}
 
-        {/* Premium / Remove Ads */}
-        {!isPremium && (
-          <div className="lobby-premium-section">
-            <motion.button
-              className="lobby-premium-btn"
-              onClick={handlePurchase}
-              whileTap={{ scale: 0.97 }}
-            >
-              בלי פרסומות. רק פוקר. ♠
-            </motion.button>
-            <button className="lobby-restore-btn" onClick={handleRestore}>
-              שחזר רכישה
-            </button>
-          </div>
-        )}
       </div>
-
-      {/* Ad banner placeholder — AdMob injects the real banner via native overlay */}
-      {!isPremium && <div className="lobby-ad-banner" />}
 
       {/* Logout */}
       <div className="lobby-logout">

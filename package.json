@@ -10,11 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor-community/admob": "^8.0.0",
     "@capacitor/android": "^8.3.1",
     "@capacitor/core": "^8.3.1",
     "@capacitor/ios": "^8.3.1",
-    "@revenuecat/purchases-capacitor": "^13.0.0",
     "@supabase/supabase-js": "^2.45.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.577.0",

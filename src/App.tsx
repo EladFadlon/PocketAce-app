@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { GamePhase, GameSettings, Player, PlayerSettlement, Debt, User } from './types';
 import { GamePhase as GamePhaseEnum } from './types';
 import { Auth } from './components/Auth';
@@ -11,8 +11,6 @@ import { calculatePlayerSettlements, minimizeDebts } from './utils/settlements';
 import { sessionToUser, signOut } from './utils/auth';
 import { supabase } from './config/supabase';
 import { saveGameRecord } from './utils/gameHistory';
-import { initializeAdMob, showBannerAd, removeBannerAd, showInterstitialAd } from './utils/admob';
-import { initializePurchases, checkPremiumStatus } from './utils/purchases';
 import './App.css';
 
 const GAME_SAVE_KEY = 'pocketAce_currentGame';
@@ -25,14 +23,6 @@ function App() {
   const [settlements, setSettlements] = useState<PlayerSettlement[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
   const [hostFee, setHostFee] = useState(0);
-  const [isPremium, setIsPremium] = useState(() => localStorage.getItem('pocketAce_isPremium') === 'true');
-  const gameJustEnded = useRef(false);
-
-  const handlePremiumChange = useCallback((value: boolean) => {
-    setIsPremium(value);
-    if (value) localStorage.setItem('pocketAce_isPremium', 'true');
-    else localStorage.removeItem('pocketAce_isPremium');
-  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -40,14 +30,6 @@ function App() {
     const handleSession = (session: Parameters<typeof sessionToUser>[0]) => {
       const user = sessionToUser(session);
       setCurrentUser(user);
-      initializePurchases(user.id).then(() => {
-        checkPremiumStatus().then(premium => {
-          if (premium && mounted) {
-            setIsPremium(true);
-            localStorage.setItem('pocketAce_isPremium', 'true');
-          }
-        });
-      });
       try {
         const saved = localStorage.getItem(GAME_SAVE_KEY);
         if (saved) {
@@ -91,24 +73,11 @@ function App() {
     }
   }, [phase, players, settings]);
 
-  useEffect(() => {
-    initializeAdMob();
-  }, []);
-
-  useEffect(() => {
-    if (phase === GamePhaseEnum.LOBBY && !isPremium) {
-      showBannerAd();
-    } else {
-      removeBannerAd();
-    }
-  }, [phase, isPremium]);
 
   const handleLogout = useCallback(async () => {
     await signOut();
     localStorage.removeItem(GAME_SAVE_KEY);
-    localStorage.removeItem('pocketAce_isPremium');
     setCurrentUser(null);
-    setIsPremium(false);
     setPhase(GamePhaseEnum.AUTH);
   }, []);
 
@@ -162,21 +131,16 @@ function App() {
       saveGameRecord(currentUser.id, host?.name || currentUser.name, ps, calculatedDebts);
     }
 
-    gameJustEnded.current = true;
     setPhase(GamePhaseEnum.RESULTS);
   }, [players, settings, currentUser]);
 
-  const resetToLobby = useCallback(async () => {
-    if (gameJustEnded.current && !isPremium) {
-      gameJustEnded.current = false;
-      await showInterstitialAd();
-    }
+  const resetToLobby = useCallback(() => {
     setPhase(GamePhaseEnum.LOBBY);
     setPlayers([]);
     setSettlements([]);
     setDebts([]);
     setHostFee(0);
-  }, [isPremium]);
+  }, []);
 
   const handleQuit = useCallback(() => {
     localStorage.removeItem(GAME_SAVE_KEY);
@@ -193,8 +157,6 @@ function App() {
           onStartGame={handleStartFromLobby}
           user={currentUser}
           onLogout={handleLogout}
-          isPremium={isPremium}
-          onPremiumChange={handlePremiumChange}
         />
       )}
 
