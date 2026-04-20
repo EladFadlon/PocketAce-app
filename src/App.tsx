@@ -8,7 +8,8 @@ import { GameTable } from './components/GameTable';
 import { EndGame } from './components/EndGame';
 import { SettlementResults } from './components/SettlementResults';
 import { calculatePlayerSettlements, minimizeDebts } from './utils/settlements';
-import { getCurrentUser, logoutUser } from './utils/auth';
+import { sessionToUser, signOut } from './utils/auth';
+import { supabase } from './config/supabase';
 import { saveGameRecord } from './utils/gameHistory';
 import { initializeAdMob, showBannerAd, removeBannerAd, showInterstitialAd } from './utils/admob';
 import { initializePurchases, checkPremiumStatus } from './utils/purchases';
@@ -34,34 +35,54 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCurrentUser(user);
+    let mounted = true;
 
-    initializePurchases(user.id).then(() => {
-      checkPremiumStatus().then(premium => {
-        if (premium) {
-          setIsPremium(true);
-          localStorage.setItem('pocketAce_isPremium', 'true');
-        }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted || !session) return;
+      const user = sessionToUser(session);
+      setCurrentUser(user);
+
+      initializePurchases(user.id).then(() => {
+        checkPremiumStatus().then(premium => {
+          if (premium && mounted) {
+            setIsPremium(true);
+            localStorage.setItem('pocketAce_isPremium', 'true');
+          }
+        });
       });
+
+      try {
+        const saved = localStorage.getItem(GAME_SAVE_KEY);
+        if (saved) {
+          const { phase: savedPhase, players: savedPlayers, settings: savedSettings } = JSON.parse(saved);
+          if (savedPlayers?.length > 0 && mounted) {
+            setPlayers(savedPlayers);
+            setSettings(savedSettings);
+            setPhase(savedPhase);
+            return;
+          }
+        }
+      } catch { /* fall through to lobby */ }
+
+      if (mounted) setPhase(GamePhaseEnum.LOBBY);
     });
 
-    try {
-      const saved = localStorage.getItem(GAME_SAVE_KEY);
-      if (saved) {
-        const { phase: savedPhase, players: savedPlayers, settings: savedSettings } = JSON.parse(saved);
-        if (savedPlayers?.length > 0) {
-          setPlayers(savedPlayers);
-          setSettings(savedSettings);
-          setPhase(savedPhase);
-          return;
-        }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+      if (event === 'SIGNED_IN' && session) {
+        const user = sessionToUser(session);
+        setCurrentUser(user);
+        setPhase(prev => prev === GamePhaseEnum.AUTH ? GamePhaseEnum.LOBBY : prev);
+      } else if (event === 'SIGNED_OUT') {
+        setCurrentUser(null);
+        setPhase(GamePhaseEnum.AUTH);
       }
-    } catch { /* fall through to lobby */ }
+    });
 
-    setPhase(GamePhaseEnum.LOBBY);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -84,13 +105,8 @@ function App() {
     }
   }, [phase, isPremium]);
 
-  const handleAuthSuccess = useCallback((user: User) => {
-    setCurrentUser(user);
-    setPhase(GamePhaseEnum.LOBBY);
-  }, []);
-
-  const handleLogout = useCallback(() => {
-    logoutUser();
+  const handleLogout = useCallback(async () => {
+    await signOut();
     localStorage.removeItem(GAME_SAVE_KEY);
     localStorage.removeItem('pocketAce_isPremium');
     setCurrentUser(null);
@@ -172,9 +188,7 @@ function App() {
 
   return (
     <div className="app">
-      {phase === GamePhaseEnum.AUTH && (
-        <Auth onAuthSuccess={handleAuthSuccess} />
-      )}
+      {phase === GamePhaseEnum.AUTH && <Auth />}
 
       {phase === GamePhaseEnum.LOBBY && currentUser && (
         <Lobby
