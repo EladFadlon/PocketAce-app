@@ -7,7 +7,6 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon-180x180.png', 'pwa-64x64.png'],
       manifest: {
         name: 'Pocket Ace',
         short_name: 'Pocket Ace',
