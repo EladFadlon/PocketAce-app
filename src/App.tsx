@@ -7,6 +7,7 @@ import { GameSetup } from './components/GameSetup';
 import { GameTable } from './components/GameTable';
 import { EndGame } from './components/EndGame';
 import { SettlementResults } from './components/SettlementResults';
+import { InstallPrompt } from './components/InstallPrompt';
 import { calculatePlayerSettlements, minimizeDebts } from './utils/settlements';
 import { sessionToUser, signOut } from './utils/auth';
 import { supabase } from './config/supabase';
@@ -207,6 +208,8 @@ function App() {
           user={currentUser}
         />
       )}
+
+      <InstallPrompt />
     </div>
   );
 }
