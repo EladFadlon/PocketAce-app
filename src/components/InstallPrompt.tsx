@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import '../styles/install-prompt.css';
 
 const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -6,14 +6,10 @@ const isStandalone = () =>
   'standalone' in navigator && (navigator as Navigator & { standalone: boolean }).standalone;
 
 export function InstallPrompt() {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
+  const [show, setShow] = useState(() => {
     const dismissed = localStorage.getItem('pocketAce_installDismissed');
-    if (isIos() && !isStandalone() && !dismissed) {
-      setShow(true);
-    }
-  }, []);
+    return isIos() && !isStandalone() && !dismissed;
+  });
 
   const dismiss = () => {
     localStorage.setItem('pocketAce_installDismissed', '1');
