@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { User, GameRecord } from '../types';
 import { getRecentGames, calculateCumulativeProfitLoss, getCumulativeStatus } from '../utils/gameHistory';
+import { getRegulars, addRegular, removeRegular } from '../utils/regulars';
 import '../styles/lobby.css';
 
 interface LobbyProps {
-  onStartGame: () => void;
+  onStartGame: (selectedNames: string[]) => void;
   user: User;
   onLogout: () => void;
   isPremium: boolean;
@@ -13,11 +14,31 @@ interface LobbyProps {
 }
 
 export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPremium, onPremiumChange }) => {
+  const CREW_COLORS = [
+    'linear-gradient(135deg,#e74c3c,#c0392b)',
+    'linear-gradient(135deg,#3498db,#2980b9)',
+    'linear-gradient(135deg,#2ecc71,#27ae60)',
+    'linear-gradient(135deg,#9b59b6,#8e44ad)',
+    'linear-gradient(135deg,#ff6b35,#e55a24)',
+    'linear-gradient(135deg,#f39c12,#d68910)',
+  ];
+  const CREW_SHADOWS = [
+    'rgba(231,76,60,0.4)', 'rgba(52,152,219,0.4)', 'rgba(46,204,113,0.4)',
+    'rgba(155,89,182,0.4)', 'rgba(255,107,53,0.4)', 'rgba(243,156,18,0.4)',
+  ];
+  const CREW_EMOJIS = ['🤙', '😎', '🦈', '🤑', '😈', '🃏'];
+
   const [showWelcome, setShowWelcome] = useState(false);
   const [recentGames, setRecentGames] = useState<GameRecord[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameRecord | null>(null);
   const [status, setStatus] = useState({ badge: '', message: '' });
   const [cumulative, setCumulative] = useState(0);
+  const [regulars, setRegulars] = useState<string[]>(() => getRegulars());
+  const [selectedRegulars, setSelectedRegulars] = useState<Set<string>>(new Set());
+  const [showAddSheet, setShowAddSheet] = useState(false);
+  const [newRegularName, setNewRegularName] = useState('');
+  const [pendingRemove, setPendingRemove] = useState<string | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const hasVisited = localStorage.getItem('pocketAceVisited');
@@ -36,10 +57,6 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
   const firstName = user.name.split(' ')[0];
   const firstLetter = firstName.charAt(0);
 
-  const CREW_COLORS = ['linear-gradient(135deg,#e74c3c,#c0392b)', 'linear-gradient(135deg,#3498db,#2980b9)', 'linear-gradient(135deg,#2ecc71,#27ae60)'];
-  const CREW_SHADOWS = ['rgba(231,76,60,0.4)', 'rgba(52,152,219,0.4)', 'rgba(46,204,113,0.4)'];
-  const CREW_EMOJIS = ['🤙', '😎', '🦈'];
-
   // no-op stubs — web monetization not yet implemented
   const handlePurchase = () => {
     // TODO: web monetization — call onPremiumChange(true) on success
@@ -48,6 +65,40 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
   const handleRestore = () => {
     // TODO: web monetization — call onPremiumChange(true) on success
     void onPremiumChange; // Mark as used
+  };
+
+  const handleToggleSelect = (name: string) => {
+    setPendingRemove(null);
+    setSelectedRegulars(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
+
+  const handleLongPressStart = (name: string) => {
+    longPressTimer.current = setTimeout(() => setPendingRemove(name), 500);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  };
+
+  const handleRemoveRegular = (name: string) => {
+    removeRegular(name);
+    setRegulars(getRegulars());
+    setPendingRemove(null);
+    setSelectedRegulars(prev => { const next = new Set(prev); next.delete(name); return next; });
+  };
+
+  const handleAddRegular = () => {
+    const trimmed = newRegularName.trim();
+    if (!trimmed) return;
+    addRegular(trimmed);
+    setRegulars(getRegulars());
+    setNewRegularName('');
+    setShowAddSheet(false);
   };
 
   return (
@@ -85,20 +136,42 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
         )}
 
         {/* Crew */}
-        <div className="lobby-crew">
+        <div className="lobby-crew" onClick={() => pendingRemove && setPendingRemove(null)}>
           <div className="lobby-section-label">החבר׳ה הקבועים</div>
           <div className="lobby-crew-row">
-            {CREW_EMOJIS.map((emoji, i) => (
-              <div className="lobby-crew-member" key={i}>
-                <div
-                  className="lobby-crew-avatar"
-                  style={{ background: CREW_COLORS[i], boxShadow: `0 4px 12px ${CREW_SHADOWS[i]}` }}
-                >{emoji}</div>
-                <span className="lobby-crew-name">שחקן {i + 1}</span>
-              </div>
-            ))}
+            {regulars.map((name, i) => {
+              const isSelected = selectedRegulars.has(name);
+              const isPendingRemove = pendingRemove === name;
+              return (
+                <div className="lobby-crew-member" key={name}>
+                  <div
+                    className={`lobby-crew-avatar${isSelected ? ' selected' : ''}${isPendingRemove ? ' pending-remove' : ''}`}
+                    style={{
+                      background: CREW_COLORS[i % CREW_COLORS.length],
+                      boxShadow: isSelected
+                        ? `0 0 0 2.5px var(--yellow), 0 4px 12px ${CREW_SHADOWS[i % CREW_SHADOWS.length]}`
+                        : `0 4px 12px ${CREW_SHADOWS[i % CREW_SHADOWS.length]}`,
+                    }}
+                    onClick={() => !isPendingRemove && handleToggleSelect(name)}
+                    onPointerDown={() => handleLongPressStart(name)}
+                    onPointerUp={handleLongPressEnd}
+                    onPointerLeave={handleLongPressEnd}
+                  >
+                    {CREW_EMOJIS[i % CREW_EMOJIS.length]}
+                    {isSelected && <span className="lobby-crew-check">✓</span>}
+                    {isPendingRemove && (
+                      <span
+                        className="lobby-crew-remove-tip"
+                        onClick={e => { e.stopPropagation(); handleRemoveRegular(name); }}
+                      >הסר?</span>
+                    )}
+                  </div>
+                  <span className="lobby-crew-name">{name}</span>
+                </div>
+              );
+            })}
             <div className="lobby-crew-member">
-              <div className="lobby-crew-add">+</div>
+              <div className="lobby-crew-add" onClick={() => setShowAddSheet(true)}>+</div>
               <span className="lobby-crew-name">הוסף</span>
             </div>
           </div>
@@ -106,8 +179,13 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
 
         {/* CTA */}
         <div className="lobby-cta-wrap">
-          <motion.button className="lobby-cta" onClick={onStartGame} whileTap={{ scale: 0.97 }}>
-            <span>⚡</span><span>פותחים שולחן</span><span>🃏</span>
+          <motion.button className="lobby-cta" onClick={() => onStartGame([...selectedRegulars])} whileTap={{ scale: 0.97 }}>
+            <span>⚡</span>
+            <span>פותחים שולחן</span>
+            {selectedRegulars.size > 0 && (
+              <span className="lobby-cta-badge">{selectedRegulars.size} נבחרו</span>
+            )}
+            {selectedRegulars.size === 0 && <span>🃏</span>}
           </motion.button>
         </div>
 
@@ -204,6 +282,39 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
                 onClick={() => setSelectedGame(null)}
                 style={{ marginTop: 16, width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '12px', borderRadius: 12, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
               >סגור</button>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Add regular bottom sheet */}
+        {showAddSheet && (
+          <motion.div
+            className="lobby-sheet-overlay"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setShowAddSheet(false)}
+          >
+            <motion.div
+              className="lobby-sheet-card"
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <button className="lobby-sheet-close" onClick={() => setShowAddSheet(false)}>✕</button>
+              <h2 className="lobby-sheet-title">הוסף קבוע 🤙</h2>
+              <input
+                className="lobby-add-regular-input"
+                type="text"
+                placeholder="שם השחקן..."
+                value={newRegularName}
+                onChange={e => setNewRegularName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleAddRegular()}
+                autoFocus
+              />
+              <motion.button
+                className="lobby-add-regular-btn"
+                onClick={handleAddRegular}
+                whileTap={{ scale: 0.97 }}
+              >+ הוסף</motion.button>
             </motion.div>
           </motion.div>
         )}

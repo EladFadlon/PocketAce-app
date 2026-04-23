@@ -294,3 +294,94 @@
   height: 60px;
   flex-shrink: 0;
 }
+
+/* Crew — selected state */
+.lobby-crew-avatar {
+  cursor: pointer;
+  position: relative;
+  transition: box-shadow 0.15s ease;
+}
+
+.lobby-crew-avatar.selected {
+  box-shadow: 0 0 0 2.5px var(--yellow), 0 4px 12px rgba(245,197,24,0.3) !important;
+}
+
+.lobby-crew-avatar.pending-remove {
+  box-shadow: 0 0 0 2.5px rgba(231,76,60,0.8), 0 0 14px rgba(231,76,60,0.35) !important;
+}
+
+.lobby-crew-check {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: var(--yellow);
+  color: #111;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  font-size: 8px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.lobby-crew-remove-tip {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(231,76,60,0.92);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* CTA badge */
+.lobby-cta-badge {
+  background: rgba(0,0,0,0.25);
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+}
+
+/* Add regular sheet */
+.lobby-add-regular-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-family: inherit;
+  outline: none;
+  direction: rtl;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.lobby-add-regular-input:focus {
+  border-color: rgba(245,197,24,0.4);
+}
+
+.lobby-add-regular-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--yellow), var(--yellow-dark));
+  color: #111;
+  border: none;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  font-family: inherit;
+}
