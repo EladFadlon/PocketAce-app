@@ -54,6 +54,12 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
     setStatus(getCumulativeStatus(cumulativeValue));
   }, [user.id, user.name]);
 
+  useEffect(() => {
+    return () => {
+      if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    };
+  }, []);
+
   const firstName = user.name.split(' ')[0];
   const firstLetter = firstName.charAt(0);
 
@@ -249,6 +255,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
       <AnimatePresence>
         {selectedGame && (
           <motion.div
+            key="game-detail-sheet"
             className="lobby-sheet-overlay"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setSelectedGame(null)}
@@ -289,6 +296,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
         {/* Add regular bottom sheet */}
         {showAddSheet && (
           <motion.div
+            key="add-regular-sheet"
             className="lobby-sheet-overlay"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setShowAddSheet(false)}
@@ -324,6 +332,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
       <AnimatePresence>
         {showWelcome && (
           <motion.div
+            key="welcome-popup"
             style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           >
