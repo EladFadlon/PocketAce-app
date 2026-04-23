@@ -55,6 +55,16 @@ Make the "החבר׳ה הקבועים" section in the Lobby functional. Users sa
 
 ---
 
+## Results Screen — Add to Regulars
+
+After a game ends, `SettlementResults` shows each player's result. For any player who is **not already** in `pocketAce_regulars`, a small `+ קבועים` button appears next to their name row.
+
+- Tapping it adds the player to regulars immediately (via `addRegular`) and the button changes to a `✓ קבוע` confirmation state.
+- The host (current user) is excluded — no button shown for their own row.
+- Players already in the regulars list show no button (no clutter).
+
+---
+
 ## Files Changed
 
 | File | Change |
@@ -63,6 +73,7 @@ Make the "החבר׳ה הקבועים" section in the Lobby functional. Users sa
 | `src/components/Lobby.tsx` | Replace hardcoded crew stub with real regulars list + selection state + add/remove UX |
 | `src/styles/lobby.css` | Add styles for selected state, long-press ring, tooltip, bottom sheet |
 | `src/components/GameSetup.tsx` | Accept `preselectedNames` prop and pre-populate players |
+| `src/components/SettlementResults.tsx` | Add "+ קבועים" button per non-regular player; toggles to "✓ קבוע" on tap |
 | `src/App.tsx` | Thread selected regulars from Lobby → GameSetup |
 | `src/types.ts` | No changes needed |
 
