@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import type { PlayerSettlement, Debt } from '../types';
+import type { PlayerSettlement, Debt, GameSettings, User } from '../types';
 import { generateWhatsAppMessage, getWhatsAppShareURL } from '../utils/settlements';
-import type { GameSettings } from '../types';
 import { getLoserInsult } from '../utils/loserInsults';
 import { getRegulars, addRegular } from '../utils/regulars';
 import '../styles/results.css';
@@ -16,8 +15,6 @@ const PLAYER_COLORS = [
   { bg: 'linear-gradient(135deg,#f39c12,#d68910)' },
 ];
 const PLAYER_EMOJIS = ['🤙', '😎', '🦈', '🤑', '😈', '🃏'];
-
-import type { User } from '../types';
 
 interface SettlementResultsProps {
   settlements: PlayerSettlement[];
