@@ -9,17 +9,25 @@ export const sessionToUser = (session: Session): User => ({
   createdAt: new Date(session.user.created_at).getTime(),
 });
 
-export const sendMagicLink = async (
+export const sendOtp = async (
   email: string,
   name?: string
 ): Promise<{ error?: string }> => {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: window.location.origin,
+      shouldCreateUser: true,
       ...(name?.trim() ? { data: { name: name.trim() } } : {}),
     },
   });
+  return error ? { error: error.message } : {};
+};
+
+export const verifyEmailOtp = async (
+  email: string,
+  token: string
+): Promise<{ error?: string }> => {
+  const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
   return error ? { error: error.message } : {};
 };
 
