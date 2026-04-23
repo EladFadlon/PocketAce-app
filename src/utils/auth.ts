@@ -17,7 +17,7 @@ export const sendOtp = async (
     email,
     options: {
       shouldCreateUser: true,
-      emailRedirectTo: window.location.origin,
+      emailRedirectTo: window.location.origin + '/',
       ...(name?.trim() ? { data: { name: name.trim() } } : {}),
     },
   });
