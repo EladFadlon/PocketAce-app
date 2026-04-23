@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { PlayerSettlement, Debt } from '../types';
 import { generateWhatsAppMessage, getWhatsAppShareURL } from '../utils/settlements';
 import type { GameSettings } from '../types';
 import { getLoserInsult } from '../utils/loserInsults';
+import { getRegulars, addRegular } from '../utils/regulars';
 import '../styles/results.css';
 
 const PLAYER_COLORS = [
@@ -34,8 +35,10 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
   gameSettings,
   hostFee,
   onPlayAgain,
-  onHome
+  onHome,
+  user
 }) => {
+  const [addedToRegulars, setAddedToRegulars] = useState<Set<string>>(() => new Set(getRegulars()));
   const whatsappMessage = generateWhatsAppMessage(gameSettings, settlements, debts, hostFee);
   const whatsappUrl = getWhatsAppShareURL(whatsappMessage);
 
@@ -87,6 +90,17 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
                   <div className={`results-player-amount ${amount >= 0 ? 'win' : 'loss'}`}>
                     {amount >= 0 ? '+' : ''}{amount.toFixed(0)}₪
                   </div>
+                  {user.name !== s.name && (
+                    addedToRegulars.has(s.name)
+                      ? <span className="results-add-regular-done">✓ קבוע</span>
+                      : <button
+                          className="results-add-regular-btn"
+                          onClick={() => {
+                            addRegular(s.name);
+                            setAddedToRegulars(prev => new Set([...prev, s.name]));
+                          }}
+                        >+ קבועים</button>
+                  )}
                 </div>
               );
             })}

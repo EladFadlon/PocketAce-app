@@ -173,3 +173,27 @@
   box-shadow: 0 4px 20px var(--yellow-glow);
   font-family: inherit;
 }
+
+/* Add to regulars */
+.results-add-regular-btn {
+  margin-right: auto;
+  background: rgba(245,197,24,0.08);
+  border: 1px solid rgba(245,197,24,0.25);
+  color: rgba(245,197,24,0.8);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.results-add-regular-done {
+  margin-right: auto;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--green);
+  flex-shrink: 0;
+}
