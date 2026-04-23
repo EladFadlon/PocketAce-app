@@ -91,7 +91,7 @@ function App() {
     setPhase(GamePhaseEnum.AUTH);
   }, []);
 
-  const handleStartFromLobby = useCallback(() => {
+  const handleStartFromLobby = useCallback((selectedNames: string[]) => {
     if (!currentUser) return;
     const hostPlayer: Player = {
       id: `host_${currentUser.id}`,
@@ -101,7 +101,15 @@ function App() {
       finalChips: settings.chipsPerBuyIn,
       isHost: true,
     };
-    setPlayers([hostPlayer]);
+    const regularPlayers: Player[] = selectedNames.map((name, i) => ({
+      id: `regular_${i}_${Date.now()}`,
+      name,
+      buyIns: 1,
+      totalInvested: settings.nisPerBuyIn,
+      finalChips: settings.chipsPerBuyIn,
+      isHost: false,
+    }));
+    setPlayers([hostPlayer, ...regularPlayers]);
     setSettlements([]);
     setDebts([]);
     setHostFee(0);
