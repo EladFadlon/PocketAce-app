@@ -22,8 +22,13 @@ interface GameSetupProps {
 export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, onHome, existingPlayers = [] }) => {
   const [nisPerBuyIn, setNisPerBuyIn] = useState(50);
   const [chipsPerBuyIn, setChipsPerBuyIn] = useState(100);
+  const [nisRaw, setNisRaw] = useState('50');
+  const [chipsRaw, setChipsRaw] = useState('100');
   const [playerName, setPlayerName] = useState('');
   const [players, setPlayers] = useState<Player[]>([]);
+
+  const updateNis = (val: number) => { setNisPerBuyIn(val); setNisRaw(String(val)); };
+  const updateChips = (val: number) => { setChipsPerBuyIn(val); setChipsRaw(String(val)); };
 
   useEffect(() => {
     // Initialize with existing players (e.g., auto-added host)
@@ -79,17 +84,50 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, onHome, exist
             <div className="setup-stepper-card">
               <div className="setup-stepper-label">₪ לכל buy-in</div>
               <div className="setup-stepper-row">
-                <button className="setup-stepper-btn minus" onClick={() => setNisPerBuyIn(Math.max(10, nisPerBuyIn - 5))}>−</button>
-                <span className="setup-stepper-value">{nisPerBuyIn}₪</span>
-                <button className="setup-stepper-btn plus" onClick={() => setNisPerBuyIn(nisPerBuyIn + 5)}>+</button>
+                <button className="setup-stepper-btn minus" onClick={() => updateNis(Math.max(10, nisPerBuyIn - 5))}>−</button>
+                <div className="setup-stepper-center">
+                  <input
+                    className="setup-stepper-value"
+                    type="number"
+                    inputMode="numeric"
+                    value={nisRaw}
+                    onChange={e => {
+                      setNisRaw(e.target.value);
+                      const v = parseInt(e.target.value, 10);
+                      if (!isNaN(v) && v > 0) setNisPerBuyIn(v);
+                    }}
+                    onBlur={() => {
+                      const v = Math.max(10, parseInt(nisRaw, 10) || 10);
+                      updateNis(v);
+                    }}
+                    onFocus={e => e.target.select()}
+                  />
+                  <span className="setup-stepper-currency">₪</span>
+                </div>
+                <button className="setup-stepper-btn plus" onClick={() => updateNis(nisPerBuyIn + 5)}>+</button>
               </div>
             </div>
             <div className="setup-stepper-card">
               <div className="setup-stepper-label">ז׳יטונים לכל buy-in</div>
               <div className="setup-stepper-row">
-                <button className="setup-stepper-btn minus" onClick={() => setChipsPerBuyIn(Math.max(50, chipsPerBuyIn - 50))}>−</button>
-                <span className="setup-stepper-value">{chipsPerBuyIn}</span>
-                <button className="setup-stepper-btn plus" onClick={() => setChipsPerBuyIn(chipsPerBuyIn + 50)}>+</button>
+                <button className="setup-stepper-btn minus" onClick={() => updateChips(Math.max(50, chipsPerBuyIn - 50))}>−</button>
+                <input
+                  className="setup-stepper-value"
+                  type="number"
+                  inputMode="numeric"
+                  value={chipsRaw}
+                  onChange={e => {
+                    setChipsRaw(e.target.value);
+                    const v = parseInt(e.target.value, 10);
+                    if (!isNaN(v) && v > 0) setChipsPerBuyIn(v);
+                  }}
+                  onBlur={() => {
+                    const v = Math.max(50, parseInt(chipsRaw, 10) || 50);
+                    updateChips(v);
+                  }}
+                  onFocus={e => e.target.select()}
+                />
+                <button className="setup-stepper-btn plus" onClick={() => updateChips(chipsPerBuyIn + 50)}>+</button>
               </div>
             </div>
           </div>

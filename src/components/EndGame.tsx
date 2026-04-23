@@ -30,9 +30,14 @@ export const EndGame: React.FC<EndGameProps> = ({
   const [finalChips, setFinalChips] = useState<Record<string, number>>(
     players.reduce((acc, p) => ({ ...acc, [p.id]: p.buyIns * settings.chipsPerBuyIn }), {})
   );
+  const [rawChips, setRawChips] = useState<Record<string, string>>(
+    players.reduce((acc, p) => ({ ...acc, [p.id]: String(p.buyIns * settings.chipsPerBuyIn) }), {})
+  );
 
   const handleChipChange = (playerId: string, value: number) => {
-    setFinalChips({ ...finalChips, [playerId]: Math.max(0, value) });
+    const clamped = Math.max(0, value);
+    setFinalChips({ ...finalChips, [playerId]: clamped });
+    setRawChips({ ...rawChips, [playerId]: String(clamped) });
   };
 
   const handleCalculate = () => {
@@ -84,7 +89,22 @@ export const EndGame: React.FC<EndGameProps> = ({
                   style={{ color: `${color.text}60` }}
                   onClick={() => handleChipChange(player.id, Math.max(0, value - settings.chipsPerBuyIn))}
                 >−</button>
-                <div className="endgame-stepper-value">{value}</div>
+                <input
+                  className="endgame-stepper-value"
+                  type="number"
+                  inputMode="numeric"
+                  value={rawChips[player.id] ?? ''}
+                  onChange={e => {
+                    setRawChips({ ...rawChips, [player.id]: e.target.value });
+                    const v = parseInt(e.target.value, 10);
+                    if (!isNaN(v) && v >= 0) setFinalChips({ ...finalChips, [player.id]: v });
+                  }}
+                  onBlur={() => {
+                    const v = Math.max(0, parseInt(rawChips[player.id], 10) || 0);
+                    handleChipChange(player.id, v);
+                  }}
+                  onFocus={e => e.target.select()}
+                />
                 <button
                   className="endgame-stepper-btn"
                   style={{ color: color.text }}

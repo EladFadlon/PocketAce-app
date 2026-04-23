@@ -91,10 +91,36 @@
   color: var(--yellow);
 }
 
+.setup-stepper-center {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+}
+
+.setup-stepper-currency {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
 .setup-stepper-value {
   font-size: 20px;
   font-weight: 900;
   color: var(--text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 52px;
+  text-align: center;
+  font-family: inherit;
+  -moz-appearance: textfield;
+  padding: 0;
+}
+
+.setup-stepper-value::-webkit-outer-spin-button,
+.setup-stepper-value::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .setup-rate-pill {
