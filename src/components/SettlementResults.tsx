@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import type { PlayerSettlement, Debt, GameSettings, User } from '../types';
 import { generateWhatsAppMessage, getWhatsAppShareURL } from '../utils/settlements';
 import { getLoserInsult } from '../utils/loserInsults';
+import { getWinnerInsult } from '../utils/winnerInsults';
 import { getRegulars, addRegular } from '../utils/regulars';
 import '../styles/results.css';
 
@@ -45,8 +46,68 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
     ? getLoserInsult(biggestLoser.name)
     : null;
 
+  const winnerInsult = winner && winner.profitLossAfterFee > 0
+    ? getWinnerInsult(winner.name)
+    : null;
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const parent = canvas.parentElement;
+    if (!parent) return;
+    canvas.width = parent.offsetWidth;
+    canvas.height = parent.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const COLORS = ['#f5c518', '#2ecc71', '#3498db', '#e74c3c', '#9b59b6'];
+    const pieces = Array.from({ length: 50 }, () => ({
+      x: Math.random() * canvas.width,
+      y: -10 - Math.random() * 30,
+      w: 3 + Math.random() * 4,
+      h: 5 + Math.random() * 5,
+      rot: Math.random() * 360,
+      rotV: (Math.random() - 0.5) * 7,
+      vy: 1.4 + Math.random() * 1.8,
+      vx: (Math.random() - 0.5) * 1.5,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      opacity: 1,
+    }));
+
+    let frame = 0;
+    let rafId: number;
+
+    const tick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of pieces) {
+        p.y += p.vy;
+        p.x += p.vx;
+        p.rot += p.rotV;
+        if (frame > 50) p.opacity -= 0.016;
+        if (p.y < canvas.height && p.opacity > 0) alive = true;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.opacity);
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+      frame++;
+      if (alive) rafId = requestAnimationFrame(tick);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    const timer = setTimeout(() => { rafId = requestAnimationFrame(tick); }, 300);
+    return () => { clearTimeout(timer); cancelAnimationFrame(rafId); };
+  }, []);
+
   return (
-    <motion.div className="results-screen" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div className="results-screen" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: 'relative' }}>
+      <canvas ref={canvasRef} className="results-confetti" />
       <div className="results-header">
         <div className="results-title">תוצאות המשחק 🏆</div>
         <div className="results-subtitle">
@@ -64,6 +125,9 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
               <div className="results-winner-label">🏆 המנצח הגדול</div>
               <div className="results-winner-name">{winner.name}</div>
               <div className="results-winner-amount">+{winner.profitLossAfterFee.toFixed(0)}₪ הערב</div>
+              {winnerInsult && (
+                <div className="results-winner-insult">{winnerInsult}</div>
+              )}
             </div>
           </div>
         )}
@@ -79,7 +143,11 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
               const emoji = PLAYER_EMOJIS[index % PLAYER_EMOJIS.length];
               const amount = s.profitLossAfterFee;
               return (
-                <div className="results-player-row" key={s.id}>
+                <div
+                  className="results-player-row"
+                  key={s.id}
+                  style={{ animationDelay: `${1.1 + index * 0.1}s` }}
+                >
                   <div className="results-player-avatar" style={{ background: color.bg }}>
                     {emoji}
                   </div>
@@ -111,14 +179,18 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
         {/* Debts */}
         {debts.length > 0 && (
           <div className="results-debts">
-            <div className="results-section-label">מי חייב למי 💸</div>
+            <div className="results-section-label results-debts-label">מי חייב למי 💸</div>
             {debts.map((debt, i) => {
               const fromIndex = settlements.findIndex(s => s.id === debt.from.id);
               const toIndex   = settlements.findIndex(s => s.id === debt.to.id);
               const fromColor = PLAYER_COLORS[Math.max(fromIndex, 0) % PLAYER_COLORS.length];
               const toColor   = PLAYER_COLORS[Math.max(toIndex, 0)   % PLAYER_COLORS.length];
               return (
-                <div className="results-debt-card" key={i}>
+                <div
+                  className="results-debt-card"
+                  key={i}
+                  style={{ animationDelay: `${1.6 + i * 0.12}s` }}
+                >
                   <div className="results-debt-avatar" style={{ background: fromColor.bg }}>{PLAYER_EMOJIS[Math.max(fromIndex, 0) % PLAYER_EMOJIS.length]}</div>
                   <div>
                     <div className="results-debt-name">{debt.from.name}</div>
