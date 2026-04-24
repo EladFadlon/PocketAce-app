@@ -119,7 +119,7 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
         {/* Winner hero */}
         {winner && winner.profitLossAfterFee > 0 && (
           <div className="results-winner">
-            <div className="results-winner-bg">🦈</div>
+            <div className="results-winner-bg" />
             <div className="results-winner-avatar">🦈</div>
             <div style={{ flex: 1 }}>
               <div className="results-winner-label">🏆 המנצח הגדול</div>
