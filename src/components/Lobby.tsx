@@ -51,7 +51,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
     setRecentGames(games);
     const cumulativeValue = calculateCumulativeProfitLoss(user.id, user.name);
     setCumulative(cumulativeValue);
-    setStatus(getCumulativeStatus(cumulativeValue));
+    setStatus(getCumulativeStatus(cumulativeValue, user.name.split(' ')[0]));
   }, [user.id, user.name]);
 
   useEffect(() => {

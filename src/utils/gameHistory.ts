@@ -87,34 +87,32 @@ export const calculateCumulativeProfitLoss = (userId: string, userName: string):
   }, 0);
 };
 
-/**
- * Get sharp sarcastic message based on cumulative status
- */
-export const getCumulativeStatus = (cumulativePL: number): { badge: string; message: string } => {
-  if (cumulativePL > 50) {
+export const getCumulativeStatus = (cumulativePL: number, name?: string): { badge: string; message: string } => {
+  const n = name ?? '';
+  if (cumulativePL > 100) {
     return {
-      badge: '🦈 SHARK MODE 🦈',
-      message: `הכנס את המשחק הבא - הקופה בעצמך! (+${cumulativePL.toFixed(2)}₪)`
-    };
-  } else if (cumulativePL > 10) {
-    return {
-      badge: '✅ בעץ ירוק',
-      message: `כל כך קרוב לכריש! (+${cumulativePL.toFixed(2)}₪)`
+      badge: '🦈 הכריש של השולחן',
+      message: `${n ? `${n}, ` : ''}תביא תיק גב לסיבוב הבא — הכיסים שלך כבר עומדים להתפוצץ. (+${cumulativePL.toFixed(2)}₪)`,
     };
   } else if (cumulativePL > 0) {
     return {
-      badge: '😐 כמעט שם',
-      message: `עוד משחק קטן ותרוויח רושם (+${cumulativePL.toFixed(2)}₪)`
+      badge: '✅ המנצח',
+      message: `${n ? `שמע ${n}, ` : ''}לפי המאזן שלך, נראה שהקלפים עושים לך כבוד. (+${cumulativePL.toFixed(2)}₪)`,
+    };
+  } else if (cumulativePL === 0) {
+    return {
+      badge: '😐 הפרווה',
+      message: `${n ? `תגיד ${n}, ` : ''}אתה משחק פוקר או עושה סטאז' בנהלת חשבונות? הכל אצלך מאוזן מדי, זה חשוד. (0₪)`,
     };
   } else if (cumulativePL > -50) {
     return {
-      badge: '📉 בעץ האדום',
-      message: `זה בסדר, סיבוב הבא הוא שלך (${cumulativePL.toFixed(2)}₪)`
+      badge: '📉 המדשדש',
+      message: `${n ? `שמע ${n}, ` : ''}המאזן שלך מזכיר את המצב הכלכלי בארץ — תמיד מרגיש שעוד רגע מסתדר, ובסוף הכל קורס. (${cumulativePL.toFixed(2)}₪)`,
     };
   } else {
     return {
-      badge: '🐑 הכבשה הנדיבה',
-      message: `הגיע הזמן לשדרג לחבילת קרדיטים חדשה ולהתחיל להרוויח! (${cumulativePL.toFixed(2)}₪)`
+      badge: '🐑 התורם הגדול',
+      message: `${n ? `${n}, ` : ''}שתדע שכולנו עשינו קבוצת וואטסאפ "תודה לך" — בזכותך הסופ"ש הקרוב עלינו. (${cumulativePL.toFixed(2)}₪)`,
     };
   }
 };
