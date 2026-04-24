@@ -136,6 +136,11 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
           </div>
         </div>
 
+        {/* Status message */}
+        {status.message && recentGames.length > 0 && (
+          <div className="lobby-status-message">{status.message}</div>
+        )}
+
         {/* Crew */}
         <div className="lobby-crew" onClick={() => pendingRemove && setPendingRemove(null)}>
           <div className="lobby-section-label">החבר׳ה הקבועים</div>

@@ -58,5 +58,4 @@ export interface GameState {
   players: Player[];
   settlements?: PlayerSettlement[];
   debts?: Debt[];
-  hostFee?: number;
 }

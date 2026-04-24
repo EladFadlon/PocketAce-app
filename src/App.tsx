@@ -23,7 +23,6 @@ function App() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [settlements, setSettlements] = useState<PlayerSettlement[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
-  const [hostFee, setHostFee] = useState(0);
   // TODO: web monetization — set via onPremiumChange once a payment provider is wired in
   const [isPremium, setIsPremium] = useState(() => localStorage.getItem('pocketAce_isPremium') === 'true');
 
@@ -112,7 +111,6 @@ function App() {
     setPlayers([hostPlayer, ...regularPlayers]);
     setSettlements([]);
     setDebts([]);
-    setHostFee(0);
     setPhase(GamePhaseEnum.SETUP);
   }, [currentUser, settings]);
 
@@ -137,12 +135,11 @@ function App() {
 
   const handleCalculateSettlements = useCallback((finalChips: Record<string, number>) => {
     const updatedPlayers = players.map(p => ({ ...p, finalChips: finalChips[p.id] || 0 }));
-    const { settlements: ps, hostFee: fee } = calculatePlayerSettlements(updatedPlayers, settings);
+    const { settlements: ps } = calculatePlayerSettlements(updatedPlayers, settings);
     const calculatedDebts = minimizeDebts(ps);
 
     setSettlements(ps);
     setDebts(calculatedDebts);
-    setHostFee(fee);
 
     if (currentUser) {
       const host = updatedPlayers.find(p => p.isHost);
@@ -157,7 +154,6 @@ function App() {
     setPlayers([]);
     setSettlements([]);
     setDebts([]);
-    setHostFee(0);
   }, []);
 
   const handleQuit = useCallback(() => {
@@ -210,7 +206,6 @@ function App() {
           settlements={settlements}
           debts={debts}
           gameSettings={settings}
-          hostFee={hostFee}
           onPlayAgain={resetToLobby}
           onHome={resetToLobby}
           user={currentUser}

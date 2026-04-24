@@ -1,6 +1,5 @@
 import type { Player, GameSettings, PlayerSettlement, Debt } from '../types';
 
-const OPERATING_COST = 300; // 3₪ = 300 agorot (integer)
 const SHARK_THRESHOLD_AGOROT = 1000; // ±10₪ before we call someone shark/donor
 const APP_URL = 'https://pocketace.app';
 
@@ -38,65 +37,25 @@ const getRandomComment = (category: 'SHARK' | 'DONOR' | 'NEUTRAL'): string => {
   return list[Math.floor(Math.random() * list.length)];
 };
 
-/**
- * Distributes OPERATING_COST among winners using the largest-remainder method
- * so that sum(shares) === OPERATING_COST exactly (no rounding drift).
- */
-function distributeOperatingCost(
-  sortedWinners: Array<{ id: string; profitLossAgorot: number }>,
-  totalWinningsAgorot: number
-): Map<string, number> {
-  if (sortedWinners.length === 0 || totalWinningsAgorot === 0) return new Map();
-
-  const exact = sortedWinners.map(w => (w.profitLossAgorot / totalWinningsAgorot) * OPERATING_COST);
-  const floors = exact.map(Math.floor);
-  const remainder = OPERATING_COST - floors.reduce((a, b) => a + b, 0);
-
-  const fracs = exact.map((e, i) => ({ i, frac: e - floors[i] }));
-  fracs.sort((a, b) => b.frac - a.frac);
-
-  const result = [...floors];
-  for (let i = 0; i < remainder; i++) result[fracs[i].i]++;
-
-  return new Map(sortedWinners.map((w, i) => [w.id, result[i]]));
-}
-
 export const calculatePlayerSettlements = (
   players: Player[],
   gameSettings: GameSettings
-): { settlements: PlayerSettlement[]; hostFee: number } => {
+): { settlements: PlayerSettlement[] } => {
   const nisPerBuyInAgorot = nisToAgorot(gameSettings.nisPerBuyIn);
   const chipsPerBuyIn = gameSettings.chipsPerBuyIn;
 
-  // Step 1: Raw profit/loss in agorot (integer throughout)
-  const preliminary = players.map(player => {
+  const settlements: PlayerSettlement[] = players.map(player => {
     const chipsGained = player.finalChips - player.buyIns * chipsPerBuyIn;
     const profitLossAgorot = Math.round((chipsGained / chipsPerBuyIn) * nisPerBuyInAgorot);
-    return { ...player, profitLossAgorot };
-  });
-
-  // Step 2: Identify winners, distribute operating cost with exact integer sum
-  const winners = preliminary
-    .filter(s => s.profitLossAgorot > 0)
-    .sort((a, b) => b.profitLossAgorot - a.profitLossAgorot);
-  const totalWinningsAgorot = winners.reduce((sum, s) => sum + s.profitLossAgorot, 0);
-  const costShareMap = distributeOperatingCost(winners, totalWinningsAgorot);
-
-  // Step 3: Apply fees; store agorot value to avoid round-trip in minimizeDebts
-  const settlements: PlayerSettlement[] = preliminary.map(s => {
-    let afterFeeAgorot = s.profitLossAgorot;
-    if (s.profitLossAgorot > 0) afterFeeAgorot -= costShareMap.get(s.id) ?? 0;
-    if (s.isHost) afterFeeAgorot += OPERATING_COST;
-
     return {
-      ...s,
-      profitLoss: agorotToNis(s.profitLossAgorot),
-      profitLossAfterFee: agorotToNis(afterFeeAgorot),
-      profitLossAfterFeeAgorot: afterFeeAgorot,
+      ...player,
+      profitLoss: agorotToNis(profitLossAgorot),
+      profitLossAfterFee: agorotToNis(profitLossAgorot),
+      profitLossAfterFeeAgorot: profitLossAgorot,
     };
   });
 
-  return { settlements, hostFee: agorotToNis(OPERATING_COST) };
+  return { settlements };
 };
 
 /**
@@ -134,8 +93,7 @@ export const minimizeDebts = (settlements: PlayerSettlement[]): Debt[] => {
 export const generateWhatsAppMessage = (
   _gameSettings: GameSettings,
   settlements: PlayerSettlement[],
-  debts: Debt[],
-  hostFee: number
+  debts: Debt[]
 ): string => {
   const winners = settlements
     .filter(s => s.profitLossAfterFee > 0)
@@ -185,8 +143,7 @@ export const generateWhatsAppMessage = (
   }
 
   msg += `*📊 סטטיסטיקות:*\n`;
-  msg += `🏆 מנצחים: ${winners.length} | 📉 מפסידים: ${losers.length} | 🎯 חובות: ${debts.length}\n`;
-  msg += `💼 עמלת תפעול: ${hostFee.toFixed(0)}₪\n\n`;
+  msg += `🏆 מנצחים: ${winners.length} | 📉 מפסידים: ${losers.length} | 🎯 חובות: ${debts.length}\n\n`;
   msg += `🎰 *ניהול פוקר בסטייל? Pocket Ace!*\n`;
   msg += `👉 ${APP_URL}\n\n`;
   msg += `_♠️ Pocket Ace ♠️_`;

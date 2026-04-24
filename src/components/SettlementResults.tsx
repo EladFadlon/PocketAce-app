@@ -21,7 +21,6 @@ interface SettlementResultsProps {
   settlements: PlayerSettlement[];
   debts: Debt[];
   gameSettings: GameSettings;
-  hostFee: number;
   onPlayAgain: () => void;
   onHome?: () => void;
   user: User;
@@ -31,13 +30,12 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
   settlements,
   debts,
   gameSettings,
-  hostFee,
   onPlayAgain,
   onHome,
   user
 }) => {
   const [addedToRegulars, setAddedToRegulars] = useState<Set<string>>(() => new Set(getRegulars()));
-  const whatsappMessage = generateWhatsAppMessage(gameSettings, settlements, debts, hostFee);
+  const whatsappMessage = generateWhatsAppMessage(gameSettings, settlements, debts);
   const whatsappUrl = getWhatsAppShareURL(whatsappMessage);
 
   const winner = [...settlements].sort((a, b) => b.profitLossAfterFee - a.profitLossAfterFee)[0];
