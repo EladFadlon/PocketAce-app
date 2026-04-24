@@ -61,7 +61,6 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
   }, []);
 
   const firstName = user.name.split(' ')[0];
-  const firstLetter = firstName.charAt(0);
 
   // no-op stubs — web monetization not yet implemented
   const handlePurchase = () => {
@@ -111,35 +110,31 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
     <div className="lobby-screen">
       {/* Top bar */}
       <div className="lobby-topbar">
-        <div className="lobby-user">
-          <div className="lobby-avatar">{firstLetter}</div>
-          <div>
-            <div className="lobby-greeting-label">שלום,</div>
-            <div className="lobby-greeting-name">{firstName} 🤙</div>
-          </div>
+        <div>
+          <div className="lobby-greeting-label">שלום,</div>
+          <div className="lobby-greeting-name">{firstName}</div>
         </div>
+        <button className="lobby-exit-btn" onClick={onLogout}>יציאה</button>
       </div>
 
       <div className="lobby-scroll">
         {/* Stats */}
-        {recentGames.length > 0 && (
-          <div className="lobby-stats">
-            <div className={`lobby-stat-card ${cumulative > 0 ? 'green' : ''}`}>
-              <div className={`lobby-stat-value ${cumulative > 0 ? 'green' : ''}`}>
-                {cumulative > 0 ? '+' : ''}{cumulative.toFixed(0)}₪
-              </div>
-              <div className="lobby-stat-label">סה&quot;כ רווח</div>
-            </div>
-            <div className="lobby-stat-card">
-              <div className="lobby-stat-value">{recentGames.length}</div>
-              <div className="lobby-stat-label">משחקים</div>
-            </div>
-            <div className="lobby-stat-card yellow">
-              <div className="lobby-stat-value yellow">{status.badge || '🃏'}</div>
-              <div className="lobby-stat-label" style={{ color: 'rgba(245,197,24,0.6)' }}>סטטוס</div>
-            </div>
+        <div className="surface lobby-stats-grid">
+          <div className="lobby-stat-cell">
+            <div className="lobby-stat-value">{recentGames.length}</div>
+            <div className="lobby-stat-label">משחקים</div>
           </div>
-        )}
+          <div className="lobby-stat-cell">
+            <div className={`lobby-stat-value ${cumulative >= 0 ? 'sage' : ''}`}>
+              {cumulative >= 0 ? '+' : ''}{cumulative.toFixed(0)}₪
+            </div>
+            <div className="lobby-stat-label">רווח כולל</div>
+          </div>
+          <div className="lobby-stat-cell">
+            <div className="lobby-stat-value gold">{status.badge || '🃏'}</div>
+            <div className="lobby-stat-label">סטטוס</div>
+          </div>
+        </div>
 
         {/* Crew */}
         <div className="lobby-crew" onClick={() => pendingRemove && setPendingRemove(null)}>
@@ -184,43 +179,42 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
         </div>
 
         {/* CTA */}
-        <div className="lobby-cta-wrap">
-          <motion.button className="lobby-cta" onClick={() => onStartGame([...selectedRegulars])} whileTap={{ scale: 0.97 }}>
-            <span>⚡</span>
-            <span>פותחים שולחן</span>
-            {selectedRegulars.size > 0 && (
-              <span className="lobby-cta-badge">{selectedRegulars.size} נבחרו</span>
-            )}
-            {selectedRegulars.size === 0 && <span>🃏</span>}
-          </motion.button>
-        </div>
+        <motion.button className="lobby-cta" onClick={() => onStartGame([...selectedRegulars])} whileTap={{ scale: 0.97 }}>
+          ♠ &nbsp; התחל משחק חדש
+          {selectedRegulars.size > 0 && (
+            <span className="lobby-cta-badge">{selectedRegulars.size} נבחרו</span>
+          )}
+        </motion.button>
 
         {/* Recent games */}
         {recentGames.length > 0 && (
-          <div className="lobby-history">
+          <div>
             <div className="lobby-section-label">משחקים אחרונים</div>
-            {recentGames.map(game => {
-              const myResult = game.playerResults?.find(p => p.name === user.name);
-              const amount = myResult?.profitLossAfterFee ?? 0;
-              return (
-                <motion.button
-                  key={game.id}
-                  className="lobby-history-item"
-                  onClick={() => setSelectedGame(game)}
-                  whileTap={{ opacity: 0.7 }}
-                >
-                  <div>
-                    <div className="lobby-history-title">
-                      {new Date(game.date).toLocaleDateString('he-IL', { month: 'short', day: 'numeric' })} • {game.debts.length + 1} שחקנים
+            <div className="lobby-history-list">
+              {recentGames.map((game, i) => {
+                const myResult = game.playerResults?.find(p => p.name === user.name);
+                const amount = myResult?.profitLossAfterFee ?? 0;
+                return (
+                  <motion.button
+                    key={game.id}
+                    className={`lobby-history-item${amount < 0 ? ' loss' : ''}`}
+                    onClick={() => setSelectedGame(game)}
+                    whileTap={{ opacity: 0.8 }}
+                    style={{ animationDelay: `${i * 0.07}s` }}
+                  >
+                    <div>
+                      <div className="lobby-history-title">
+                        {new Date(game.date).toLocaleDateString('he-IL', { month: 'short', day: 'numeric' })} · {game.debts.length + 1} שחקנים
+                      </div>
+                      <div className="lobby-history-sub">₪{game.totalPot.toLocaleString('he-IL')}</div>
                     </div>
-                    <div className="lobby-history-sub">{game.debts.length} חובות</div>
-                  </div>
-                  <div className={`lobby-history-amount ${amount >= 0 ? 'win' : 'loss'}`}>
-                    {game.topShark ? `🦈 +${game.topShark.amount.toFixed(0)}₪` : `${amount >= 0 ? '+' : ''}${amount.toFixed(0)}₪`}
-                  </div>
-                </motion.button>
-              );
-            })}
+                    <div className={`lobby-history-amount ${amount >= 0 ? 'win' : 'loss'}`}>
+                      {amount >= 0 ? '+' : ''}{amount.toFixed(0)}₪
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -243,13 +237,6 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
 
       {/* Reserved layout space for future web ad banner */}
       {!isPremium && <div className="lobby-ad-banner" />}
-
-      {/* Logout */}
-      <div className="lobby-logout">
-        <button className="lobby-logout-btn" onClick={onLogout}>
-          <span>↩</span><span>התנתק</span>
-        </button>
-      </div>
 
       {/* Game details bottom sheet */}
       <AnimatePresence>
