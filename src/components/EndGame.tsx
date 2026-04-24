@@ -78,7 +78,7 @@ export const EndGame: React.FC<EndGameProps> = ({
               >{emoji}</div>
               <div className="endgame-player-info">
                 <div className="endgame-player-name">{player.name}</div>
-                <div className="endgame-player-invested">השקיע: {player.buyIns * settings.nisPerBuyIn}₪ (×{player.buyIns})</div>
+                <div className="endgame-player-invested">מושקע: {player.buyIns * settings.nisPerBuyIn}₪ (×{player.buyIns})</div>
               </div>
               <div
                 className="endgame-stepper"
