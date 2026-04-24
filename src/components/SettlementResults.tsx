@@ -77,7 +77,7 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
     }));
 
     let frame = 0;
-    let rafId: number;
+    let rafId: number | undefined;
 
     const tick = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -102,7 +102,7 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
     };
 
     const timer = setTimeout(() => { rafId = requestAnimationFrame(tick); }, 300);
-    return () => { clearTimeout(timer); cancelAnimationFrame(rafId); };
+    return () => { clearTimeout(timer); if (rafId !== undefined) cancelAnimationFrame(rafId); };
   }, []);
 
   return (
