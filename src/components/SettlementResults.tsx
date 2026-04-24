@@ -177,7 +177,7 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
         {/* Debts */}
         {debts.length > 0 && (
           <div className="results-debts">
-            <div className="results-section-label results-debts-label">מי חייב למי 💸</div>
+            <div className="results-section-label results-debts-label">מי משלם למי 💸</div>
             {debts.map((debt, i) => {
               const fromIndex = settlements.findIndex(s => s.id === debt.from.id);
               const toIndex   = settlements.findIndex(s => s.id === debt.to.id);
@@ -189,13 +189,25 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
                   key={i}
                   style={{ animationDelay: `${1.6 + i * 0.12}s` }}
                 >
-                  <div className="results-debt-avatar" style={{ background: fromColor.bg }}>{PLAYER_EMOJIS[Math.max(fromIndex, 0) % PLAYER_EMOJIS.length]}</div>
-                  <div>
-                    <div className="results-debt-name">{debt.from.name}</div>
-                    <div className="results-debt-to">חייב ל-{debt.to.name}</div>
+                  {/* Payer */}
+                  <div className="results-debt-party">
+                    <div className="results-debt-avatar" style={{ background: fromColor.bg }}>{PLAYER_EMOJIS[Math.max(fromIndex, 0) % PLAYER_EMOJIS.length]}</div>
+                    <div className="results-debt-party-label">משלם</div>
+                    <div className="results-debt-party-name">{debt.from.name}</div>
                   </div>
-                  <div className="results-debt-avatar" style={{ background: toColor.bg, marginRight: 'auto' }}>{PLAYER_EMOJIS[Math.max(toIndex, 0) % PLAYER_EMOJIS.length]}</div>
-                  <div className="results-debt-amount">{debt.amount.toFixed(0)}₪</div>
+
+                  {/* Amount + arrow */}
+                  <div className="results-debt-mid">
+                    <div className="results-debt-amount">{debt.amount.toFixed(0)}₪</div>
+                    <div className="results-debt-arrow">←</div>
+                  </div>
+
+                  {/* Recipient */}
+                  <div className="results-debt-party">
+                    <div className="results-debt-avatar" style={{ background: toColor.bg }}>{PLAYER_EMOJIS[Math.max(toIndex, 0) % PLAYER_EMOJIS.length]}</div>
+                    <div className="results-debt-party-label">מקבל</div>
+                    <div className="results-debt-party-name">{debt.to.name}</div>
+                  </div>
                 </div>
               );
             })}
