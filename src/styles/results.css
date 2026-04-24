@@ -3,22 +3,36 @@
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
+  background: var(--bg0);
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   direction: rtl;
 }
 
+/* ── Header ── */
 .results-header {
-  padding: 14px 16px 10px;
+  padding: 16px 18px 12px;
   border-bottom: 1px solid var(--border);
   text-align: center;
   flex-shrink: 0;
 }
 
-.results-title    { font-size: 22px; font-weight: 900; color: var(--text-primary); margin: 0 0 2px; }
-.results-subtitle { font-size: 10px; color: var(--text-secondary); }
+.results-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--paper);
+  margin: 0 0 2px;
+  letter-spacing: -0.02em;
+}
 
+.results-subtitle {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ── Body ── */
 .results-body {
   flex: 1;
   overflow-y: auto;
@@ -27,24 +41,29 @@
   gap: 0;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+  scrollbar-width: none;
 }
+.results-body::-webkit-scrollbar { display: none; }
 
-/* Section label */
+/* ── Section label ── */
 .results-section-label {
   font-size: 10px;
-  color: var(--text-secondary);
-  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
   margin-bottom: 8px;
 }
 
-/* Winner hero */
+/* ── Winner hero ── */
 .results-winner {
-  margin: 12px 16px 8px;
-  background: linear-gradient(135deg,rgba(46,204,113,0.15),rgba(46,204,113,0.04));
-  border: 1px solid rgba(46,204,113,0.35);
-  border-radius: var(--radius-lg);
+  margin: 12px 18px 8px;
+  background: linear-gradient(135deg, rgba(74,122,90,0.18), rgba(74,122,90,0.05));
+  border: 1px solid rgba(74,122,90,0.35);
+  border-radius: 12px;
   padding: 14px;
-  display: flex; align-items: center; gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   position: relative;
   opacity: 0;
   animation: res-pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
@@ -52,7 +71,7 @@
 
 .results-winner-bg {
   position: absolute; inset: 0;
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   overflow: hidden;
   pointer-events: none;
 }
@@ -66,67 +85,154 @@
 .results-winner-avatar {
   width: 52px; height: 52px;
   border-radius: 50%;
-  background: linear-gradient(135deg,#2ecc71,#27ae60);
+  background: linear-gradient(135deg, var(--sage), var(--sage2));
   display: flex; align-items: center; justify-content: center;
   font-size: 26px;
-  box-shadow: 0 6px 20px rgba(46,204,113,0.5);
+  box-shadow: 0 6px 20px rgba(74,122,90,0.45);
   flex-shrink: 0;
+  min-height: unset;
   opacity: 0;
   animation: res-avatar-bounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s both;
 }
 
-.results-winner-label  { font-size: 10px; color: rgba(46,204,113,0.7); font-weight: 600; letter-spacing: 1px; margin-bottom: 2px; }
-.results-winner-name   { font-size: 18px; font-weight: 900; color: var(--text-primary); }
-.results-winner-amount { font-size: 13px; font-weight: 700; color: var(--green); opacity: 0; animation: res-fade-up 0.4s ease 0.85s both; }
+.results-winner-label {
+  font-size: 10px;
+  color: rgba(94,154,112,0.8);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
 
-/* Players list */
-.results-players { padding: 0 16px 10px; }
+.results-winner-name {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--paper);
+}
+
+.results-winner-amount {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sage2);
+  opacity: 0;
+  animation: res-fade-up 0.4s ease 0.85s both;
+}
+
+/* ── Winner insult ── */
+.results-winner-insult {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(74,122,90,0.15);
+  font-size: 9px;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.4;
+  opacity: 0;
+  animation: res-fade-up 0.4s ease 1.1s both;
+}
+
+/* ── Players list ── */
+.results-players { padding: 0 18px 10px; }
 
 .results-player-row {
-  background: rgba(255,255,255,0.03);
+  background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  display: flex; align-items: center; gap: 10px;
+  border-radius: 10px;
+  padding: 10px 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 6px;
+  position: relative;
+  overflow: hidden;
   opacity: 0;
   animation: res-slide-in 0.35s ease both;
+}
+.results-player-row::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,190,168,0.10), transparent);
 }
 
 .results-player-avatar {
   width: 32px; height: 32px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 15px; flex-shrink: 0;
+  font-size: 15px;
+  flex-shrink: 0;
+  min-height: unset;
 }
 
-.results-player-name   { flex: 1; font-size: 12px; font-weight: 700; color: var(--text-primary); }
-.results-player-amount { font-size: 13px; font-weight: 800; }
-.results-player-amount.win  { color: var(--green); }
-.results-player-amount.loss { color: var(--red); }
+.results-player-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--paper);
+}
 
-/* Loser insult */
+.results-player-amount {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 800;
+}
+.results-player-amount.win  { color: var(--sage2); }
+.results-player-amount.loss { color: var(--rust2); }
+
+/* ── Loser insult ── */
 .results-loser-insult {
-  margin: 0 16px 10px;
-  padding: 8px 12px;
-  background: rgba(231,76,60,0.06);
-  border: 1px solid rgba(231,76,60,0.15);
-  border-radius: var(--radius-sm);
+  margin: 0 18px 10px;
+  padding: 8px 13px;
+  background: var(--rust-bg);
+  border: 1px solid rgba(138,74,42,0.20);
+  border-radius: 10px;
   font-size: 11px;
-  color: rgba(255,255,255,0.5);
+  color: var(--muted);
   text-align: center;
   font-style: italic;
 }
 
-/* Debts */
-.results-debts { padding: 0 16px 10px; }
+/* ── Add to regulars ── */
+.results-add-regular-btn {
+  margin-right: auto;
+  background: var(--sage-bg);
+  border: 1px solid rgba(74,122,90,0.25);
+  color: var(--sage2);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: unset;
+}
+
+.results-add-regular-done {
+  margin-right: auto;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--sage2);
+  flex-shrink: 0;
+}
+
+/* ── Debts section ── */
+.results-debts { padding: 0 18px 10px; }
+
+.results-debts-label {
+  opacity: 0;
+  animation: res-fade-up 0.3s ease 1.55s both;
+}
 
 .results-debt-card {
-  background: linear-gradient(135deg,rgba(245,197,24,0.08),rgba(245,197,24,0.02));
-  border: 1px solid rgba(245,197,24,0.2);
-  border-radius: var(--radius-sm);
+  background: var(--gold-bg);
+  border: 1px solid var(--gold-border);
+  border-radius: 10px;
   padding: 12px 14px;
-  display: flex; align-items: center; gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 6px;
   opacity: 0;
   animation: res-fade-up 0.35s ease both;
@@ -136,84 +242,105 @@
   width: 28px; height: 28px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; flex-shrink: 0;
+  font-size: 13px;
+  flex-shrink: 0;
+  min-height: unset;
 }
 
-.results-debt-name   { font-size: 12px; font-weight: 700; color: var(--text-primary); }
-.results-debt-to     { font-size: 10px; color: var(--text-secondary); }
-.results-debt-amount { margin-right: auto; font-size: 14px; font-weight: 900; color: var(--yellow); }
+.results-debt-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--paper);
+}
 
-/* WhatsApp share */
+.results-debt-to {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.results-debt-amount {
+  margin-right: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--gold);
+}
+
+/* ── WhatsApp share ── */
 .results-whatsapp {
-  margin: 0 16px 10px;
-  background: linear-gradient(135deg,rgba(37,211,102,0.12),rgba(37,211,102,0.04));
-  border: 1px solid rgba(37,211,102,0.25);
-  border-radius: var(--radius-sm);
+  margin: 0 18px 10px;
+  background: rgba(37,211,102,0.08);
+  border: 1px solid rgba(37,211,102,0.20);
+  border-radius: 10px;
   padding: 12px 14px;
-  display: flex; align-items: center; gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
-  width: 100%; text-align: right;
+  width: 100%;
+  text-align: right;
   font-family: inherit;
+  min-height: unset;
   opacity: 0;
   animation: res-fade-up 0.35s ease 1.84s both;
 }
+.results-whatsapp:hover { background: rgba(37,211,102,0.12); }
 
 .results-whatsapp-icon  { font-size: 22px; }
-.results-whatsapp-title { font-size: 12px; font-weight: 700; color: var(--text-primary); }
-.results-whatsapp-sub   { font-size: 9px; color: var(--text-secondary); margin-top: 1px; }
-.results-whatsapp-arrow { margin-right: auto; font-size: 16px; color: var(--text-dim); }
+.results-whatsapp-title { font-size: 12px; font-weight: 700; color: var(--paper); }
+.results-whatsapp-sub   { font-size: 9px; color: var(--muted); margin-top: 1px; }
+.results-whatsapp-arrow { margin-right: auto; font-size: 16px; color: var(--dimmer); }
 
-/* Bottom */
+/* ── Footer ── */
 .results-footer {
-  display: flex; gap: 8px;
-  padding: 10px 16px 20px;
+  display: flex;
+  gap: 8px;
+  padding: 10px 18px 20px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
 
 .results-home-btn {
   flex: 1;
-  background: rgba(255,255,255,0.05);
-  color: rgba(255,255,255,0.5);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 13px 0; border-radius: var(--radius-md);
-  font-size: 12px; font-weight: 700;
-  cursor: pointer; font-family: inherit;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--borderA);
+  padding: 13px 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Heebo', sans-serif;
+  min-height: unset;
+  transition: all 0.16s;
 }
+.results-home-btn:hover { color: var(--paper); border-color: rgba(200,190,168,0.30); }
 
 .results-again-btn {
   flex: 2;
-  background: linear-gradient(135deg, var(--yellow), var(--yellow-dark));
-  color: #111; border: none;
-  padding: 13px 0; border-radius: var(--radius-md);
-  font-size: 13px; font-weight: 900;
+  background: var(--sage);
+  color: rgba(255,255,255,0.92);
+  border: none;
+  padding: 13px 0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 4px 20px var(--yellow-glow);
-  font-family: inherit;
+  box-shadow: 0 3px 16px rgba(74,122,90,0.18);
+  font-family: 'Heebo', sans-serif;
+  letter-spacing: -0.01em;
+  min-height: unset;
+  transition: all 0.16s;
 }
+.results-again-btn:hover { background: var(--sage2); transform: translateY(-1px); }
+.results-again-btn:active { opacity: 0.8; transform: scale(0.98); }
 
-/* Add to regulars */
-.results-add-regular-btn {
-  margin-right: auto;
-  background: rgba(245,197,24,0.08);
-  border: 1px solid rgba(245,197,24,0.25);
-  color: rgba(245,197,24,0.8);
-  font-size: 9px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.results-add-regular-done {
-  margin-right: auto;
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--green);
-  flex-shrink: 0;
+/* ── confetti canvas ── */
+.results-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
 }
 
 /* ─── ANIMATIONS ────────────────────────────────────── */
@@ -235,31 +362,4 @@
 @keyframes res-slide-in {
   from { opacity: 0; transform: translateX(-14px); }
   to   { opacity: 1; transform: translateX(0);     }
-}
-
-/* winner insult — fade up */
-.results-winner-insult {
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(46, 204, 113, 0.15);
-  font-size: 9px;
-  font-style: italic;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.4;
-  opacity: 0;
-  animation: res-fade-up 0.4s ease 1.1s both;
-}
-
-/* debts section label — fade up */
-.results-debts-label {
-  opacity: 0;
-  animation: res-fade-up 0.3s ease 1.55s both;
-}
-
-/* confetti canvas */
-.results-confetti {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 10;
 }
