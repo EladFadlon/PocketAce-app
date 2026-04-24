@@ -39,10 +39,15 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, onHome, exist
   }, [existingPlayers]);
 
   const handleAddPlayer = () => {
-    if (playerName.trim()) {
+    const trimmed = playerName.trim();
+    if (trimmed && players.some(p => p.name.toLowerCase() === trimmed.toLowerCase())) {
+      alert(`שחקן בשם "${trimmed}" כבר קיים`);
+      return;
+    }
+    if (trimmed) {
       const newPlayer: Player = {
         id: Date.now().toString(),
-        name: playerName.trim(),
+        name: trimmed,
         buyIns: 1,
         totalInvested: nisPerBuyIn,
         finalChips: chipsPerBuyIn,

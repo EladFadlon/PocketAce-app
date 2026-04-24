@@ -70,12 +70,15 @@ interface GameTableProps {
   onAddBuyIn: (playerId: string) => void;
   onEndGame: () => void;
   onQuit: () => void;
-  onHome: () => void;
+  gameStartedAt?: number;
 }
 
-export const GameTable: React.FC<GameTableProps> = ({ players, settings, onAddBuyIn, onEndGame, onQuit }) => {
-  const [elapsed, setElapsed] = useState(0);
+export const GameTable: React.FC<GameTableProps> = ({ players, settings, onAddBuyIn, onEndGame, onQuit, gameStartedAt }) => {
+  const [elapsed, setElapsed] = useState(() =>
+    gameStartedAt ? Math.floor((Date.now() - gameStartedAt) / 1000) : 0
+  );
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -131,7 +134,7 @@ export const GameTable: React.FC<GameTableProps> = ({ players, settings, onAddBu
 
       {/* Footer */}
       <div className="table-footer">
-        <button className="table-quit-btn" onClick={onQuit}>יציאה</button>
+        <button className="table-quit-btn" onClick={() => setShowQuitConfirm(true)}>יציאה</button>
         <button className="table-end-btn" onClick={() => setShowConfirm(true)}>סגור שולחן</button>
       </div>
 
@@ -152,6 +155,29 @@ export const GameTable: React.FC<GameTableProps> = ({ players, settings, onAddBu
               <div className="table-confirm-actions">
                 <button className="table-confirm-continue" onClick={() => setShowConfirm(false)}>המשך</button>
                 <button className="table-confirm-close" onClick={onEndGame}>סגור</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Quit confirm modal */}
+      <AnimatePresence>
+        {showQuitConfirm && (
+          <motion.div
+            className="table-confirm-overlay"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="table-confirm-card surface"
+              initial={{ scale: 0.92, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 16 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+            >
+              <div className="table-confirm-title">לצאת מהמשחק?</div>
+              <div className="table-confirm-sub">כל ההתקדמות תימחק</div>
+              <div className="table-confirm-actions">
+                <button className="table-confirm-continue" onClick={() => setShowQuitConfirm(false)}>המשך</button>
+                <button className="table-confirm-close" onClick={onQuit}>צא</button>
               </div>
             </motion.div>
           </motion.div>

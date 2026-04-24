@@ -38,7 +38,13 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
   const whatsappMessage = generateWhatsAppMessage(gameSettings, settlements, debts);
   const whatsappUrl = getWhatsAppShareURL(whatsappMessage);
 
-  const winner = [...settlements].sort((a, b) => b.profitLossAfterFee - a.profitLossAfterFee)[0];
+  const sortedSettlements = [...settlements].sort((a, b) => b.profitLossAfterFee - a.profitLossAfterFee);
+  const colorMap = new Map(sortedSettlements.map((s, i) => [s.id, {
+    color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+    emoji: PLAYER_EMOJIS[i % PLAYER_EMOJIS.length],
+  }]));
+
+  const winner = sortedSettlements[0];
   const biggestLoser = [...settlements].sort((a, b) => a.profitLossAfterFee - b.profitLossAfterFee)[0];
   const loserInsult = biggestLoser && biggestLoser.profitLossAfterFee < 0
     ? getLoserInsult(biggestLoser.name)
@@ -133,12 +139,8 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
         {/* All players */}
         <div className="results-players">
           <div className="results-section-label">כל השחקנים</div>
-          {settlements
-            .slice()
-            .sort((a, b) => b.profitLossAfterFee - a.profitLossAfterFee)
-            .map((s, index) => {
-              const color = PLAYER_COLORS[index % PLAYER_COLORS.length];
-              const emoji = PLAYER_EMOJIS[index % PLAYER_EMOJIS.length];
+          {sortedSettlements.map((s, index) => {
+              const { color, emoji } = colorMap.get(s.id)!;
               const amount = s.profitLossAfterFee;
               return (
                 <div
@@ -179,10 +181,8 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
           <div className="results-debts">
             <div className="results-section-label results-debts-label">מי משלם למי 💸</div>
             {debts.map((debt, i) => {
-              const fromIndex = settlements.findIndex(s => s.id === debt.from.id);
-              const toIndex   = settlements.findIndex(s => s.id === debt.to.id);
-              const fromColor = PLAYER_COLORS[Math.max(fromIndex, 0) % PLAYER_COLORS.length];
-              const toColor   = PLAYER_COLORS[Math.max(toIndex, 0)   % PLAYER_COLORS.length];
+              const from = colorMap.get(debt.from.id) ?? { color: PLAYER_COLORS[0], emoji: PLAYER_EMOJIS[0] };
+              const to   = colorMap.get(debt.to.id)   ?? { color: PLAYER_COLORS[1], emoji: PLAYER_EMOJIS[1] };
               return (
                 <div
                   className="results-debt-card"
@@ -191,7 +191,7 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
                 >
                   {/* Payer */}
                   <div className="results-debt-party">
-                    <div className="results-debt-avatar" style={{ background: fromColor.bg }}>{PLAYER_EMOJIS[Math.max(fromIndex, 0) % PLAYER_EMOJIS.length]}</div>
+                    <div className="results-debt-avatar" style={{ background: from.color.bg }}>{from.emoji}</div>
                     <div className="results-debt-party-label">משלם</div>
                     <div className="results-debt-party-name">{debt.from.name}</div>
                   </div>
@@ -204,7 +204,7 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
 
                   {/* Recipient */}
                   <div className="results-debt-party">
-                    <div className="results-debt-avatar" style={{ background: toColor.bg }}>{PLAYER_EMOJIS[Math.max(toIndex, 0) % PLAYER_EMOJIS.length]}</div>
+                    <div className="results-debt-avatar" style={{ background: to.color.bg }}>{to.emoji}</div>
                     <div className="results-debt-party-label">מקבל</div>
                     <div className="results-debt-party-name">{debt.to.name}</div>
                   </div>

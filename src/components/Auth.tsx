@@ -213,8 +213,8 @@ export const Auth: React.FC = () => {
               {loading && <p className="auth-verify-sub">מאמת...</p>}
 
               <div className="auth-link">
-                <span onClick={handleResend}>שלח שוב</span>
-                <span onClick={() => { setStep('initial'); setCode(''); setError(''); }}>← חזור</span>
+                <span onClick={!loading ? handleResend : undefined} style={loading ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>שלח שוב</span>
+                <span onClick={!loading ? () => { setStep('initial'); setCode(''); setError(''); } : undefined} style={loading ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>← חזור</span>
               </div>
             </motion.div>
           )}

@@ -25,6 +25,7 @@ function App() {
   const [debts, setDebts] = useState<Debt[]>([]);
   // TODO: web monetization — set via onPremiumChange once a payment provider is wired in
   const [isPremium, setIsPremium] = useState(() => localStorage.getItem('pocketAce_isPremium') === 'true');
+  const [gameStartedAt, setGameStartedAt] = useState<number | null>(null);
 
   const handlePremiumChange = useCallback((value: boolean) => {
     setIsPremium(value);
@@ -41,11 +42,12 @@ function App() {
       try {
         const saved = localStorage.getItem(GAME_SAVE_KEY);
         if (saved) {
-          const { phase: savedPhase, players: savedPlayers, settings: savedSettings } = JSON.parse(saved);
+          const { phase: savedPhase, players: savedPlayers, settings: savedSettings, gameStartedAt: savedStartedAt } = JSON.parse(saved);
           if (savedPlayers?.length > 0 && mounted) {
             setPlayers(savedPlayers);
             setSettings(savedSettings);
             setPhase(savedPhase);
+            setGameStartedAt(savedStartedAt ?? null);
             return;
           }
         }
@@ -75,7 +77,7 @@ function App() {
 
   useEffect(() => {
     if (phase === GamePhaseEnum.TABLE || phase === GamePhaseEnum.END_GAME) {
-      localStorage.setItem(GAME_SAVE_KEY, JSON.stringify({ phase, players, settings }));
+      localStorage.setItem(GAME_SAVE_KEY, JSON.stringify({ phase, players, settings, gameStartedAt }));
     } else if (([GamePhaseEnum.LOBBY, GamePhaseEnum.RESULTS, GamePhaseEnum.AUTH] as string[]).includes(phase)) {
       localStorage.removeItem(GAME_SAVE_KEY);
     }
@@ -117,6 +119,7 @@ function App() {
   const handleStartGame = useCallback((newSettings: GameSettings, newPlayers: Player[]) => {
     setSettings(newSettings);
     setPlayers(newPlayers);
+    setGameStartedAt(Date.now());
     setPhase(GamePhaseEnum.TABLE);
   }, []);
 
@@ -187,7 +190,7 @@ function App() {
           onAddBuyIn={handleAddBuyIn}
           onEndGame={handleEndGame}
           onQuit={handleQuit}
-          onHome={resetToLobby}
+          gameStartedAt={gameStartedAt ?? undefined}
         />
       )}
 

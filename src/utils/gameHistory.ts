@@ -17,6 +17,8 @@ export const getGameHistory = (userId: string): GameRecord[] => {
 /**
  * Save game record to user's history
  */
+const MAX_HISTORY = 100;
+
 export const saveGameRecord = (
   userId: string,
   hostsName: string,
@@ -24,17 +26,18 @@ export const saveGameRecord = (
   debts: Debt[]
 ) => {
   const history = getGameHistory(userId);
-  
+
   const topShark = settlements
     .filter(s => s.profitLossAfterFee > 0)
     .sort((a, b) => b.profitLossAfterFee - a.profitLossAfterFee)[0];
-  
+
   const totalPot = settlements.reduce((sum, s) => sum + s.totalInvested, 0);
-  
+
   const record: GameRecord = {
     id: `game_${Date.now()}`,
     date: Date.now(),
     hostsName,
+    hostUserId: userId,
     totalPot,
     topShark: topShark ? {
       name: topShark.name,
@@ -50,10 +53,10 @@ export const saveGameRecord = (
       profitLossAfterFee: parseFloat(s.profitLossAfterFee.toFixed(2))
     }))
   };
-  
-  history.unshift(record); // Add to top
-  localStorage.setItem(`${GAME_HISTORY_KEY}_${userId}`, JSON.stringify(history));
-  
+
+  history.unshift(record);
+  localStorage.setItem(`${GAME_HISTORY_KEY}_${userId}`, JSON.stringify(history.slice(0, MAX_HISTORY)));
+
   return record;
 };
 
@@ -76,13 +79,18 @@ export const clearGameHistory = (userId: string) => {
  */
 export const calculateCumulativeProfitLoss = (userId: string, userName: string): number => {
   const history = getGameHistory(userId);
-  
+
   return history.reduce((cumulative, game) => {
     if (!game.playerResults) return cumulative;
-    
-    const userResult = game.playerResults.find(p => p.name === userName);
+
+    // For records that store hostUserId, match the host's result by their stored name.
+    // Fall back to name-matching for older records without hostUserId.
+    const hostName = game.hostUserId === userId ? game.hostsName : null;
+    const userResult = game.playerResults.find(p =>
+      hostName ? p.name === hostName : p.name === userName
+    );
     if (!userResult) return cumulative;
-    
+
     return cumulative + userResult.profitLossAfterFee;
   }, 0);
 };
@@ -121,7 +129,7 @@ export const getCumulativeStatus = (cumulativePL: number, name?: string): { badg
     };
   }
 
-  if (cumulativePL === 0) {
+  if (Math.abs(cumulativePL) < 0.5) {
     return {
       badge: '😐 הפרווה',
       message: pick([

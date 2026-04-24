@@ -14,6 +14,7 @@ export interface GameRecord {
   id: string;
   date: number;
   hostsName: string;
+  hostUserId?: string;
   totalPot: number;
   topShark: { name: string; amount: number } | null;
   debts: Array<{ from: string; to: string; amount: number }>;

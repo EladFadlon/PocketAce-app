@@ -42,5 +42,5 @@ export function getWinnerInsult(name: string): string {
   }
   const template = queue.shift()!;
   saveQueue(queue);
-  return template.replace('{name}', name);
+  return template.replaceAll('{name}', name);
 }

@@ -209,7 +209,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
                   >
                     <div>
                       <div className="lobby-history-title">
-                        {new Date(game.date).toLocaleDateString('he-IL', { month: 'short', day: 'numeric' })} · {game.debts.length + 1} שחקנים
+                        {new Date(game.date).toLocaleDateString('he-IL', { month: 'short', day: 'numeric' })} · {game.playerResults?.length ?? game.debts.length + 1} שחקנים
                       </div>
                       <div className="lobby-history-sub">₪{game.totalPot.toLocaleString('he-IL')}</div>
                     </div>
