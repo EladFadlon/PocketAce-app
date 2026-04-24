@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, User as UserIcon } from 'lucide-react';
 import { sendOtp, verifyEmailOtp } from '../utils/auth';
 import '../styles/auth.css';
 
@@ -83,7 +82,27 @@ export const Auth: React.FC = () => {
 
   return (
     <div className="auth-screen">
-      <div className="auth-bg-glow" />
+      {/* Big background spade */}
+      <div className="auth-bg-spade">♠</div>
+
+      {/* Floating suits */}
+      {(['♠', '♣', '♥', '♦'] as const).map((suit, i) => (
+        <div
+          key={suit}
+          className="auth-suit"
+          style={{
+            fontSize: [60, 44, 52, 40][i],
+            color: `rgba(200,190,168,${[0.04, 0.03, 0.035, 0.025][i]})`,
+            top:  ['8%', '70%', '60%', '18%'][i],
+            left: ['5%', '76%',  '7%', '80%'][i],
+            animation: `auth-float ${[4, 4.8, 5.2, 4.4][i]}s ease-in-out infinite`,
+            animationDelay: `${[0, 0.7, 1.3, 0.4][i]}s`,
+          }}
+        >
+          {suit}
+        </div>
+      ))}
+
       <div className="auth-inner">
         <AnimatePresence mode="wait">
           {step === 'initial' ? (
@@ -94,58 +113,73 @@ export const Auth: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <div className="auth-logo-card">♠</div>
-              <h1 className="auth-app-name">Pocket Ace</h1>
-              <p className="auth-tagline">תן לקלפים לדבר בשבילך ♠</p>
-
-              <div className="auth-tab-switcher">
-                <button
-                  className={`auth-tab ${isLogin ? 'active' : ''}`}
-                  onClick={() => { setIsLogin(true); setError(''); }}
-                >כניסה</button>
-                <button
-                  className={`auth-tab ${!isLogin ? 'active' : ''}`}
-                  onClick={() => { setIsLogin(false); setError(''); }}
-                >הרשמה</button>
+              {/* Split logo */}
+              <div className="auth-logo-wrap">
+                <div className="auth-logo-text">
+                  Pocket<br />
+                  <span className="auth-logo-ace">Ace</span>
+                </div>
+                <div className="auth-logo-sub">ניהול שולחן פוקר</div>
               </div>
 
-              <form className="auth-inputs" onSubmit={handleEmailSubmit} style={{ width: '100%' }}>
-                {!isLogin && (
-                  <div className="auth-input-row">
-                    <span className="auth-input-icon"><UserIcon size={15} /></span>
-                    <input
-                      type="text"
-                      placeholder="שם מלא"
-                      value={name}
-                      onChange={e => setName(e.target.value)}
-                      autoComplete="name"
-                    />
-                  </div>
-                )}
-                <div className="auth-input-row">
-                  <span className="auth-input-icon"><Mail size={15} /></span>
-                  <input
-                    type="email"
-                    placeholder="כתובת אימייל"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    autoComplete="email"
-                    dir="ltr"
-                  />
+              {/* Card */}
+              <div className="auth-card surface">
+                <div className="auth-tab-switcher">
+                  <button
+                    className={`auth-tab ${isLogin ? 'active' : ''}`}
+                    onClick={() => { setIsLogin(true); setError(''); }}
+                  >כניסה</button>
+                  <button
+                    className={`auth-tab ${!isLogin ? 'active' : ''}`}
+                    onClick={() => { setIsLogin(false); setError(''); }}
+                  >הרשמה</button>
                 </div>
 
-                {error && <p className="auth-error">{error}</p>}
+                <form className="auth-inputs" onSubmit={handleEmailSubmit}>
+                  {!isLogin && (
+                    <div>
+                      <div className="auth-input-label">שם / כינוי</div>
+                      <input
+                        className="input-new"
+                        type="text"
+                        placeholder="איך קוראים לך?"
+                        value={name}
+                        onChange={e => setName(e.target.value)}
+                        autoComplete="name"
+                        style={{ direction: 'rtl', minHeight: 'unset' }}
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <div className="auth-input-label">אימייל</div>
+                    <input
+                      className="input-new"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      autoComplete="email"
+                      dir="ltr"
+                      style={{ textAlign: 'right', minHeight: 'unset' }}
+                    />
+                  </div>
 
-                <button className="auth-cta" type="submit" disabled={loading}>
-                  {loading ? '...' : 'בוא נשחק 🤙'}
-                </button>
-              </form>
+                  {error && <p className="auth-error">{error}</p>}
 
-              <div className="auth-divider">
-                {isLogin
-                  ? <span onClick={() => { setIsLogin(false); setError(''); }}>פתח חשבון — זה שניה</span>
-                  : <span onClick={() => { setIsLogin(true); setError(''); }}>כבר יש לך חשבון? כנסו</span>
-                }
+                  <button className="btn-new btn-sage auth-cta" type="submit" disabled={loading}>
+                    {loading
+                      ? <><span className="auth-spinner" /> טוען...</>
+                      : isLogin ? 'כנס ♠' : 'הצטרף ♠'
+                    }
+                  </button>
+                </form>
+
+                <div className="auth-divider">
+                  {isLogin
+                    ? <span onClick={() => { setIsLogin(false); setError(''); }}>פתח חשבון — זה שניה</span>
+                    : <span onClick={() => { setIsLogin(true);  setError(''); }}>כבר יש לך חשבון? כנסו</span>
+                  }
+                </div>
               </div>
             </motion.div>
           ) : (
@@ -178,7 +212,7 @@ export const Auth: React.FC = () => {
               {error && <p className="auth-error">{error}</p>}
               {loading && <p className="auth-verify-sub">מאמת...</p>}
 
-              <div className="auth-link" style={{ marginTop: '1.5rem', display: 'flex', gap: '1.5rem' }}>
+              <div className="auth-link">
                 <span onClick={handleResend}>שלח שוב</span>
                 <span onClick={() => { setStep('initial'); setCode(''); setError(''); }}>← חזור</span>
               </div>
