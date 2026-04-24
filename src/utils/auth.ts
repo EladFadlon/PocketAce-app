@@ -1,37 +1,27 @@
-import { supabase } from '../config/supabase';
 import type { User } from '../types';
-import type { Session } from '@supabase/supabase-js';
 
-export const sessionToUser = (session: Session): User => ({
-  id: session.user.id,
-  name: (session.user.user_metadata?.name as string) || '',
-  email: session.user.email || '',
-  createdAt: new Date(session.user.created_at).getTime(),
-});
+const USER_KEY = 'pocketAce_user';
 
-export const sendOtp = async (
-  email: string,
-  name?: string
-): Promise<{ error?: string }> => {
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      shouldCreateUser: true,
-      emailRedirectTo: window.location.origin,
-      ...(name?.trim() ? { data: { name: name.trim() } } : {}),
-    },
-  });
-  return error ? { error: error.message } : {};
+export const getStoredUser = (): User | null => {
+  try {
+    const stored = localStorage.getItem(USER_KEY);
+    return stored ? (JSON.parse(stored) as User) : null;
+  } catch {
+    return null;
+  }
 };
 
-export const verifyEmailOtp = async (
-  email: string,
-  token: string
-): Promise<{ error?: string }> => {
-  const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
-  return error ? { error: error.message } : {};
+export const createUser = (name: string): User => {
+  const user: User = {
+    id: crypto.randomUUID(),
+    name: name.trim(),
+    email: '',
+    createdAt: Date.now(),
+  };
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  return user;
 };
 
-export const signOut = async (): Promise<void> => {
-  await supabase.auth.signOut();
+export const signOut = (): void => {
+  localStorage.removeItem(USER_KEY);
 };
