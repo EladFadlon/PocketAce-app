@@ -2,41 +2,65 @@
 
 /* ─── DESIGN TOKENS ─────────────────────────────────────────── */
 :root {
-  /* Backgrounds */
-  --bg-primary:   #080810;
-  --bg-secondary: #0d0d18;
-  --bg-card:      rgba(255,255,255,0.03);
-  --bg-glass:     rgba(255,255,255,0.04);
+  /* ── Warm charcoal backgrounds ── */
+  --bg0:     #1A1614;
+  --bg1:     #201C18;
+  --bg2:     #272118;
+  --bg3:     #2E2820;
+  --bg4:     #362E24;
 
-  /* Text */
-  --text-primary:   #ffffff;
-  --text-secondary: rgba(255,255,255,0.4);
-  --text-dim:       rgba(255,255,255,0.15);
+  /* ── Text ── */
+  --paper:   #C8BEA8;
+  --muted:   rgba(200,190,168,0.38);
+  --dimmer:  rgba(200,190,168,0.14);
+  --dimmest: rgba(200,190,168,0.07);
 
-  /* Accent */
-  --yellow:        #f5c518;
-  --yellow-dark:   #d4a017;
-  --yellow-glow:   rgba(245,197,24,0.4);
-  --yellow-glass:  rgba(245,197,24,0.1);
-  --yellow-border: rgba(245,197,24,0.3);
+  /* ── Sage green — CTAs, win ── */
+  --sage:    #4A7A5A;
+  --sage2:   #5E9A70;
+  --sage-bg: rgba(74,122,90,0.12);
 
-  /* Semantic */
-  --green:   #2ecc71;
-  --red:     #e74c3c;
-  --border:  rgba(255,255,255,0.07);
+  /* ── Rust — danger, loss ── */
+  --rust:    #8A4A2A;
+  --rust2:   #A85A38;
+  --rust-bg: rgba(138,74,42,0.12);
 
-  /* Shadows */
-  --shadow-card:   0 8px 32px rgba(0,0,0,0.55);
-  --shadow-yellow: 0 6px 28px rgba(245,197,24,0.4);
+  /* ── Gold — money, pot ── */
+  --gold:        #C49A2C;
+  --gold-bg:     rgba(196,154,44,0.10);
+  --gold-border: rgba(196,154,44,0.20);
 
-  /* Layout */
+  /* ── Borders ── */
+  --border:  rgba(200,190,168,0.08);
+  --borderA: rgba(200,190,168,0.18);
+
+  /* ── Legacy aliases — keep so unchanged components don't break ── */
+  --bg-primary:   var(--bg0);
+  --bg-secondary: var(--bg1);
+  --bg-card:      var(--bg2);
+  --bg-glass:     var(--bg3);
+  --text-primary:   var(--paper);
+  --text-secondary: var(--muted);
+  --text-dim:       var(--dimmer);
+  --yellow:        var(--gold);
+  --yellow-dark:   #7A5C14;
+  --yellow-glow:   rgba(196,154,44,0.30);
+  --yellow-glass:  var(--gold-bg);
+  --yellow-border: var(--gold-border);
+  --green:   var(--sage2);
+  --red:     var(--rust2);
+
+  /* ── Shadows ── */
+  --shadow-card:   0 4px 24px rgba(0,0,0,0.30);
+  --shadow-yellow: 0 3px 16px rgba(74,122,90,0.18);
+
+  /* ── Layout (unchanged) ── */
   --touch:      48px;
   --radius-sm:  10px;
-  --radius-md:  14px;
-  --radius-lg:  18px;
-  --radius-xl:  24px;
+  --radius-md:  10px;
+  --radius-lg:  10px;
+  --radius-xl:  10px;
 
-  /* Safe areas */
   --safe-top:    env(safe-area-inset-top,    0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left:   env(safe-area-inset-left,   0px);
@@ -45,9 +69,9 @@
   font-size: 16px;
   line-height: 1.5;
   color-scheme: dark;
-  color: var(--text-primary);
-  background: var(--bg-primary);
-  font-family: 'Inter', 'Heebo', 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--paper);
+  background: var(--bg0);
+  font-family: 'Heebo', 'Assistant', -apple-system, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -57,13 +81,11 @@
 /* ─── GLOBAL RESET ───────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
-  /* kill 300ms tap delay everywhere */
   -webkit-tap-highlight-color: transparent;
 }
 
 html {
   height: 100%;
-  /* never shrink below 16px — prevents iOS auto-zoom on inputs */
   font-size: 16px;
   overflow: hidden;
   direction: rtl;
@@ -75,7 +97,22 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: var(--bg-primary);
+  background: var(--bg0);
+}
+
+/* Diagonal film-grain texture */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9999;
+  opacity: 0.04;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(200,190,168,0.35) 0px,
+    rgba(200,190,168,0.35) 1px,
+    transparent 1px,
+    transparent 6px
+  );
 }
 
 #root {
@@ -90,20 +127,19 @@ body {
 h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700; letter-spacing: -0.3px; }
 p { margin: 0; }
 
-/* ─── INPUTS ─────────────────────────────────────────────────── */
-/* 16px prevents iOS Safari auto-zoom on focus */
+/* ─── GLOBAL INPUTS ──────────────────────────────────────────── */
 input, textarea, select {
   direction: rtl;
   text-align: right;
   font-family: inherit;
   font-size: 16px;
   min-height: var(--touch);
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
-  border: 1.5px solid var(--border);
+  background: var(--bg3);
+  color: var(--paper);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 12px 16px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.18s, box-shadow 0.18s;
   outline: none;
   -webkit-appearance: none;
   appearance: none;
@@ -111,8 +147,8 @@ input, textarea, select {
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: var(--yellow);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.14);
+  border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(74,122,90,0.10);
 }
 
 input:disabled, textarea:disabled, select:disabled {
@@ -120,10 +156,9 @@ input:disabled, textarea:disabled, select:disabled {
   cursor: not-allowed;
 }
 
-input::placeholder { color: var(--text-dim); }
+input::placeholder { color: var(--muted); }
 
-/* ─── BUTTONS ─────────────────────────────────────────────────── */
-/* Every button: 48px touch target, no tap delay */
+/* ─── GLOBAL BUTTONS ─────────────────────────────────────────── */
 button {
   font-family: inherit;
   font-size: 15px;
@@ -143,39 +178,118 @@ button {
 button:active:not(:disabled) { opacity: 0.82; }
 button:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
 
-/* ─── SCROLLABLE UTILITY ─────────────────────────────────────── */
+/* ─── SHARED SURFACE CARD ────────────────────────────────────── */
+.surface {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.surface::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,190,168,0.12), transparent);
+  pointer-events: none;
+}
+
+/* ─── SHARED BUTTON VARIANTS ─────────────────────────────────── */
+.btn-new {
+  font-family: 'Heebo', sans-serif;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: all 0.16s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+  border-radius: 8px;
+}
+.btn-new:active  { opacity: 0.8; transform: scale(0.98); }
+.btn-new:disabled { opacity: 0.3; cursor: not-allowed; transform: none !important; }
+
+.btn-sage {
+  background: var(--sage);
+  color: rgba(255,255,255,0.92);
+  box-shadow: 0 3px 16px rgba(74,122,90,0.18);
+}
+.btn-sage:hover:not(:disabled) { background: var(--sage2); transform: translateY(-1px); }
+
+.btn-rust {
+  background: var(--rust);
+  color: rgba(255,255,255,0.90);
+  box-shadow: 0 3px 14px rgba(138,74,42,0.16);
+}
+.btn-rust:hover:not(:disabled) { background: var(--rust2); transform: translateY(-1px); }
+
+.btn-ghost-new {
+  background: transparent;
+  border: 1px solid var(--borderA);
+  border-radius: 8px;
+  color: var(--muted);
+  font-family: 'Heebo', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s;
+}
+.btn-ghost-new:hover { border-color: rgba(200,190,168,0.30); color: var(--paper); }
+
+.btn-gold-grad {
+  background: linear-gradient(135deg, #7A5C14 0%, #C49A2C 50%, #7A5C14 100%);
+  color: #1A1614;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 3px 14px rgba(196,154,44,0.15);
+  font-family: 'Heebo', sans-serif;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.16s;
+}
+.btn-gold-grad:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ─── SHARED INPUT ───────────────────────────────────────────── */
+.input-new {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--paper);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  padding: 12px 13px;
+  outline: none;
+  min-height: unset;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.input-new:focus {
+  border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(74,122,90,0.10);
+}
+.input-new::placeholder { color: var(--muted); }
+
+/* ─── UTILITIES ──────────────────────────────────────────────── */
 .scroll-area {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  /* hide scrollbar visually */
   scrollbar-width: none;
 }
 .scroll-area::-webkit-scrollbar { display: none; }
 
-/* ─── GLASS UTILITY ──────────────────────────────────────────── */
-.glass {
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--yellow-border);
-  border-radius: var(--radius-lg);
+.label-muted {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 /* ─── KEYFRAMES ──────────────────────────────────────────────── */
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow:
-      0 0 20px var(--yellow-glow),
-      0 6px 24px rgba(0, 0, 0, 0.45);
-  }
-  50% {
-    box-shadow:
-      0 0 48px var(--yellow-glow),
-      0 0 72px rgba(212, 175, 55, 0.18),
-      0 6px 24px rgba(0, 0, 0, 0.45);
-  }
+  0%, 100% { box-shadow: 0 0 20px rgba(74,122,90,0.3), 0 6px 24px rgba(0,0,0,0.45); }
+  50%       { box-shadow: 0 0 48px rgba(74,122,90,0.5), 0 6px 24px rgba(0,0,0,0.45); }
 }
 
 @keyframes float {
@@ -202,4 +316,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
   0%   { transform: scale(0.6); opacity: 0; }
   70%  { transform: scale(1.08); }
   100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes screen-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
