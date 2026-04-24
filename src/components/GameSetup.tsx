@@ -65,7 +65,12 @@ export const GameSetup: React.FC<GameSetupProps> = ({ onStartGame, onHome, exist
 
   const handleStart = () => {
     if (players.length >= 2) {
-      onStartGame({ nisPerBuyIn, chipsPerBuyIn }, players);
+      const finalPlayers = players.map(p => ({
+        ...p,
+        totalInvested: p.buyIns * nisPerBuyIn,
+        finalChips: p.buyIns * chipsPerBuyIn,
+      }));
+      onStartGame({ nisPerBuyIn, chipsPerBuyIn }, finalPlayers);
     }
   };
 
