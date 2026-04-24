@@ -109,7 +109,7 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
       <div className="results-header">
         <div className="results-title">תוצאות המשחק 🏆</div>
         <div className="results-subtitle">
-          {settlements.length} שחקנים • {settlements.reduce((s, p) => s + p.totalInvested, 0)}₪ בקופה
+          {settlements.length} שחקנים • {settlements.reduce((s, p) => s + p.buyIns * gameSettings.nisPerBuyIn, 0)}₪ בקופה
         </div>
       </div>
 

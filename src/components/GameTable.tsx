@@ -73,7 +73,7 @@ interface GameTableProps {
   onHome: () => void;
 }
 
-export const GameTable: React.FC<GameTableProps> = ({ players, onAddBuyIn, onEndGame, onQuit }) => {
+export const GameTable: React.FC<GameTableProps> = ({ players, settings, onAddBuyIn, onEndGame, onQuit }) => {
   const [elapsed, setElapsed] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -88,7 +88,7 @@ export const GameTable: React.FC<GameTableProps> = ({ players, onAddBuyIn, onEnd
     onAddBuyIn(player.id);
   };
 
-  const totalPot = players.reduce((s, p) => s + p.totalInvested, 0);
+  const totalPot = players.reduce((s, p) => s + p.buyIns * settings.nisPerBuyIn, 0);
 
   return (
     <div className="game-table-screen">
@@ -123,7 +123,7 @@ export const GameTable: React.FC<GameTableProps> = ({ players, onAddBuyIn, onEnd
               >{player.name}</div>
               <div className="table-player-sub">×{player.buyIns} קנייה</div>
             </div>
-            <div className="table-player-balance">₪{player.totalInvested.toLocaleString('he-IL')}</div>
+            <div className="table-player-balance">₪{(player.buyIns * settings.nisPerBuyIn).toLocaleString('he-IL')}</div>
             <button className="table-buyin-btn" onClick={() => handleAddBuyIn(player)}>+ קנייה</button>
           </motion.div>
         ))}
