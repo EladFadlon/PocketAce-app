@@ -9,8 +9,7 @@ import { EndGame } from './components/EndGame';
 import { SettlementResults } from './components/SettlementResults';
 import { InstallPrompt } from './components/InstallPrompt';
 import { calculatePlayerSettlements, minimizeDebts } from './utils/settlements';
-import { sessionToUser, signOut } from './utils/auth';
-import { supabase } from './config/supabase';
+import { getStoredUser } from './utils/auth';
 import { saveGameRecord } from './utils/gameHistory';
 import './App.css';
 
@@ -34,45 +33,23 @@ function App() {
   }, []);
 
   useEffect(() => {
-    let mounted = true;
-
-    const handleSession = (session: Parameters<typeof sessionToUser>[0]) => {
-      const user = sessionToUser(session);
-      setCurrentUser(user);
-      try {
-        const saved = localStorage.getItem(GAME_SAVE_KEY);
-        if (saved) {
-          const { phase: savedPhase, players: savedPlayers, settings: savedSettings, gameStartedAt: savedStartedAt } = JSON.parse(saved);
-          if (savedPlayers?.length > 0 && mounted) {
-            setPlayers(savedPlayers);
-            setSettings(savedSettings);
-            setPhase(savedPhase);
-            setGameStartedAt(savedStartedAt ?? null);
-            return;
-          }
+    const user = getStoredUser();
+    if (!user) return; // stay on AUTH
+    setCurrentUser(user);
+    try {
+      const saved = localStorage.getItem(GAME_SAVE_KEY);
+      if (saved) {
+        const { phase: savedPhase, players: savedPlayers, settings: savedSettings, gameStartedAt: savedStartedAt } = JSON.parse(saved);
+        if (savedPlayers?.length > 0) {
+          setPlayers(savedPlayers);
+          setSettings(savedSettings);
+          setPhase(savedPhase);
+          setGameStartedAt(savedStartedAt ?? null);
+          return;
         }
-      } catch { /* fall through to lobby */ }
-      if (mounted) setPhase(GamePhaseEnum.LOBBY);
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!mounted) return;
-      if (event === 'INITIAL_SESSION') {
-        if (session) handleSession(session);
-      } else if (event === 'SIGNED_IN' && session) {
-        const user = sessionToUser(session);
-        setCurrentUser(user);
-        setPhase(prev => prev === GamePhaseEnum.AUTH ? GamePhaseEnum.LOBBY : prev);
-      } else if (event === 'SIGNED_OUT') {
-        setCurrentUser(null);
-        setPhase(GamePhaseEnum.AUTH);
       }
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    } catch { /* fall through */ }
+    setPhase(GamePhaseEnum.LOBBY);
   }, []);
 
   useEffect(() => {
@@ -84,12 +61,9 @@ function App() {
   }, [phase, players, settings]);
 
 
-  const handleLogout = useCallback(async () => {
-    await signOut();
-    localStorage.removeItem(GAME_SAVE_KEY);
-    localStorage.removeItem('pocketAce_isPremium');
-    setCurrentUser(null);
-    setPhase(GamePhaseEnum.AUTH);
+  const handleAuth = useCallback((user: User) => {
+    setCurrentUser(user);
+    setPhase(GamePhaseEnum.LOBBY);
   }, []);
 
   const handleStartFromLobby = useCallback((selectedNames: string[]) => {
@@ -167,13 +141,12 @@ function App() {
 
   return (
     <div className="app">
-      {phase === GamePhaseEnum.AUTH && <Auth />}
+      {phase === GamePhaseEnum.AUTH && <Auth onAuth={handleAuth} />}
 
       {phase === GamePhaseEnum.LOBBY && currentUser && (
         <Lobby
           onStartGame={handleStartFromLobby}
           user={currentUser}
-          onLogout={handleLogout}
           isPremium={isPremium}
           onPremiumChange={handlePremiumChange}
         />
