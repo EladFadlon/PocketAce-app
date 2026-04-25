@@ -8,12 +8,11 @@ import '../styles/lobby.css';
 interface LobbyProps {
   onStartGame: (selectedNames: string[]) => void;
   user: User;
-  onLogout: () => void;
   isPremium: boolean;
   onPremiumChange: (value: boolean) => void;
 }
 
-export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPremium, onPremiumChange }) => {
+export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, isPremium, onPremiumChange }) => {
   const CREW_COLORS = [
     'linear-gradient(135deg,#e74c3c,#c0392b)',
     'linear-gradient(135deg,#3498db,#2980b9)',
@@ -114,7 +113,6 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, onLogout, isPre
           <div className="lobby-greeting-label">שלום,</div>
           <div className="lobby-greeting-name">{firstName}</div>
         </div>
-        <button className="lobby-exit-btn" onClick={onLogout}>יציאה</button>
       </div>
 
       <div className="lobby-scroll">
