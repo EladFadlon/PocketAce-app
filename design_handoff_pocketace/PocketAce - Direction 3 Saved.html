@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PocketAce ♠ v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+:root {
+  /* Backgrounds — warm charcoal/mahogany */
+  --bg-void:    #08070A;
+  --bg-deep:    #100D0A;
+  --bg-surface: #18140F;
+  --bg-elevated:#201A13;
+  --bg-felt:    #142416;
+
+  /* Accents */
+  --gold:        #C49A2C;
+  --gold-light:  #D4AA3C;
+  --gold-dim:    #8A6B1C;
+  --felt-green:  #1E5C30;
+  --felt-light:  #2A7A40;
+  --crimson:     #8B2020;
+  --crimson-bright: #B83030;
+  --amber:       #B86A1A;
+
+  /* Text — warm ivory */
+  --text-primary: #E4D8C0;
+  --text-muted:   rgba(228,216,192,0.42);
+  --text-gold:    #C49A2C;
+  --text-green:   #3A9A50;
+  --text-red:     #C04040;
+
+  /* Borders — warm gold undertone */
+  --border-subtle: rgba(196,154,44,0.10);
+  --border-active: rgba(196,154,44,0.30);
+  --border-felt:   rgba(30,92,48,0.35);
+
+  /* Shadows — candlelight, not LED */
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.5), 0 1px 0 rgba(196,154,44,0.06);
+  --shadow-gold:  0 4px 20px rgba(196,154,44,0.12);
+  --shadow-felt:  0 4px 20px rgba(30,92,48,0.14);
+  --shadow-red:   0 4px 20px rgba(176,48,48,0.16);
+
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+  --radius-pill:100px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+
+html, body, #root {
+  width:100%; height:100%;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  direction: rtl;
+  overflow: hidden;
+}
+
+/* Grain — like old felt */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  pointer-events:none; z-index:9999;
+  opacity:0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+}
+
+@keyframes slide-up {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity:0; transform:scale(0.93); }
+  to   { opacity:1; transform:scale(1); }
+}
+@keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes float {
+  0%,100% { transform:translateY(0); }
+  50%     { transform:translateY(-6px); }
+}
+@keyframes confetti-fall {
+  0%   { transform:translateY(-20px) rotate(0deg); opacity:1; }
+  100% { transform:translateY(130px) rotate(540deg); opacity:0; }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.screen { animation: slide-up 0.35s ease both; }
+
+.scroll-area {
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin; scrollbar-color:var(--border-subtle) transparent;
+}
+.scroll-area::-webkit-scrollbar { width:3px; }
+.scroll-area::-webkit-scrollbar-thumb { background:var(--border-subtle); border-radius:2px; }
+
+/* ── CARD ── */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  position:relative; overflow:hidden;
+}
+.card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  opacity:0.5;
+}
+
+/* ── FELT CARD ── accent left border */
+.card-felt {
+  border-right:3px solid var(--felt-green);
+}
+.card-win  { border-right:3px solid var(--felt-light); }
+.card-lose { border-right:3px solid var(--crimson); }
+
+/* ── BUTTONS ── */
+.btn {
+  font-family:var(--font-display); font-weight:700;
+  border:none; border-radius:var(--radius-pill); cursor:pointer;
+  transition:all 0.18s; display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-primary {
+  background: var(--felt-green);
+  color: #E4D8C0;
+  box-shadow: var(--shadow-felt);
+}
+.btn-primary:hover { background: var(--felt-light); transform:translateY(-1px); }
+.btn-primary:active { transform:translateY(0); }
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+  background-size: 200% auto;
+  color: #0A0807;
+  box-shadow: var(--shadow-gold);
+}
+.btn-gold:hover { background-position: right center; transform:translateY(-1px); }
+
+.btn-danger {
+  background: var(--crimson);
+  color: #E4D8C0;
+  box-shadow: var(--shadow-red);
+}
+.btn-danger:hover { background: var(--crimson-bright); transform:translateY(-1px); }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-family: var(--font-display); font-weight:600;
+  cursor: pointer; transition:all 0.18s;
+}
+.btn-ghost:hover { border-color:var(--border-active); color:var(--text-primary); }
+
+/* ── INPUT ── */
+.input-base {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size:15px; padding:12px 14px; width:100%;
+  outline:none; direction:rtl;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-base:focus {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 3px rgba(196,154,44,0.08);
+}
+.input-base::placeholder { color:var(--text-muted); }
+
+/* ── GOLD TEXT ── */
+.gold-text {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold-dim) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+  margin:0;
+}
+
+/* TWEAKS */
+.tweaks-panel {
+  position:fixed; bottom:20px; left:20px;
+  background:var(--bg-surface); border:1px solid var(--border-active);
+  border-radius:var(--radius-md); padding:16px; z-index:10000;
+  width:200px; box-shadow:var(--shadow-gold); animation:scale-in 0.2s ease; font-size:13px;
+}
+.tweaks-panel label { color:var(--text-muted); display:block; margin-bottom:6px; margin-top:12px; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; }
+.tweaks-panel select { width:100%; background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:6px; color:var(--text-primary); font-family:var(--font-mono); padding:6px 8px; font-size:12px; outline:none; }
+.tweaks-title { font-weight:700; color:var(--text-gold); font-size:13px; letter-spacing:0.04em; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const { useState, useEffect, useRef } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "tableColor": "burgundy",
+  "density": "compact"
+} /*EDITMODE-END*/;
+
+const fmt = (n) => new Intl.NumberFormat('he-IL').format(Math.round(n));
+const suits = ['♠', '♥', '♦', '♣'];
+
+const GAME_HISTORY = [
+{ id: 1, date: '20.04', players: ['דנה', 'יוסי', 'מיכל'], pot: 1200, result: +340 },
+{ id: 2, date: '15.04', players: ['אבי', 'שרה', 'ליאור', 'דנה'], pot: 2400, result: -180 },
+{ id: 3, date: '08.04', players: ['יוסי', 'ליאור', 'עמית'], pot: 900, result: +120 }];
+
+
+/* ── TABLE FELT CIRCLE ── */
+function FeltCircle() {
+  return (
+    <div style={{
+      position: 'absolute', left: '50%', top: '50%',
+      transform: 'translate(-50%,-50%)',
+      width: 380, height: 380, borderRadius: '50%',
+      background: 'radial-gradient(circle at 40% 40%, rgba(30,92,48,0.09) 0%, transparent 65%)',
+      border: '1px solid rgba(30,92,48,0.10)',
+      pointerEvents: 'none'
+    }}>
+      <div style={{ position: 'absolute', inset: 24, borderRadius: '50%', border: '1px solid rgba(30,92,48,0.06)' }} />
+    </div>);
+
+}
+
+/* ── CHIP SVG ── */
+function Chip({ size = 32, color = '#1E5C30', label = '♠' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="16" cy="16" r="14" fill={color} stroke="rgba(255,255,255,0.10)" strokeWidth="1" />
+      <circle cx="16" cy="16" r="10" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="1.5" strokeDasharray="2.5 2.5" />
+      <text x="16" y="21" textAnchor="middle" fontSize="10" fill="rgba(255,255,255,0.6)" fontFamily="serif">{label}</text>
+    </svg>);
+
+}
+
+/* ── CHIP STACK ── */
+function ChipStack({ count = 1, size = 34 }) {
+  const colors = ['#1E5C30', '#8B2020', '#1A3A6A', '#6A4A1A'];
+  return (
+    <div style={{ position: 'relative', width: size, height: size + count * 4, flexShrink: 0 }}>
+      {Array.from({ length: Math.min(count, 4) }).map((_, i) =>
+      <div key={i} style={{
+        position: 'absolute', bottom: i * 4, left: 0,
+        width: size, height: size, borderRadius: '50%',
+        background: colors[i % colors.length],
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.4)'
+      }}>
+          {i === count - 1 && <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'rgba(255,255,255,0.5)', fontFamily: 'serif' }}>♠</div>}
+        </div>
+      )}
+    </div>);
+
+}
+
+/* ── CONFETTI ── */
+function Confetti({ active }) {
+  if (!active) return null;
+  return (
+    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 9998, overflow: 'hidden' }}>
+      {Array.from({ length: 22 }, (_, i) => ({
+        id: i, x: Math.random() * 100, delay: Math.random() * 0.7,
+        color: ['#C49A2C', '#D4AA3C', '#1E5C30', '#8B2020', '#B86A1A'][i % 5],
+        size: 5 + Math.random() * 5
+      })).map((p) =>
+      <div key={p.id} style={{
+        position: 'absolute', left: `${p.x}%`, top: '-10px',
+        width: p.size, height: p.size, background: p.color,
+        borderRadius: p.id % 3 === 0 ? '50%' : '2px',
+        animation: `confetti-fall 1.4s ease-in ${p.delay}s both`
+      }} />
+      )}
+    </div>);
+
+}
+
+/* ══════════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════════ */
+function AuthScreen({ onLogin }) {
+  const [mode, setMode] = useState('login');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 800));
+    onLogin({ name: name || 'שחקן', email });
+  };
+
+  return (
+    <div className="screen" style={{
+      minHeight: '100dvh', position: 'relative',
+      background: 'var(--bg-void)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      padding: 24, overflow: 'hidden'
+    }}>
+      {/* Giant felt table circle */}
+      <div style={{
+        position: 'absolute', left: '50%', top: '48%',
+        transform: 'translate(-50%,-50%)',
+        width: 520, height: 520, borderRadius: '50%',
+        background: 'radial-gradient(circle at 38% 38%, rgba(30,92,48,0.13) 0%, rgba(30,92,48,0.05) 40%, transparent 70%)',
+        border: '1px solid rgba(30,92,48,0.13)',
+        boxShadow: 'inset 0 0 60px rgba(0,0,0,0.3)',
+        pointerEvents: 'none'
+      }}>
+        <div style={{ position: 'absolute', inset: 28, borderRadius: '50%', border: '1px solid rgba(30,92,48,0.07)' }} />
+        <div style={{ position: 'absolute', inset: 60, borderRadius: '50%', border: '1px dashed rgba(196,154,44,0.05)' }} />
+      </div>
+
+      {/* Suit symbols on table */}
+      {['♠', '♥', '♦', '♣'].map((s, i) =>
+      <div key={i} style={{
+        position: 'absolute', fontSize: 26, fontFamily: 'serif',
+        color: 'rgba(196,154,44,0.10)',
+        top: [`18%`, `66%`, `23%`, `62%`][i],
+        left: [`15%`, `70%`, `70%`, `15%`][i],
+        animation: `float ${3 + i * 0.6}s ease-in-out infinite`,
+        animationDelay: `${i * 0.4}s`,
+        userSelect: 'none', pointerEvents: 'none'
+      }}>{s}</div>
+      )}
+
+      {/* Logo */}
+      <div style={{ textAlign: 'center', marginBottom: 28, position: 'relative', zIndex: 2 }}>
+        <div style={{
+          fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 0.9,
+
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontFamily: "\"Libre Baskerville\"", background: "linear-gradient(135deg, rgb(138, 107, 28) 0%, rgb(212, 170, 60) 50%, rgb(138, 107, 28) 100%) 0% 0% / contain text", fontSize: "70px"
+        }}>POCKET<br />ACE</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 10 }}>
+          <div style={{ height: 1, width: 36, background: 'linear-gradient(90deg,transparent,var(--gold-dim))' }} />
+          <div style={{ color: 'var(--text-muted)', letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: "10px", fontFamily: "sans-serif" }}>ניהול פוקר</div>
+          <div style={{ height: 1, width: 36, background: 'linear-gradient(90deg,var(--gold-dim),transparent)' }} />
+        </div>
+      </div>
+
+      {/* Form — minimal, floats on table */}
+      <div style={{ width: '100%', maxWidth: 300, position: 'relative', zIndex: 2 }}>
+        {/* Mode toggle pills */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 20 }}>
+          {['login', 'register'].map((m) =>
+          <button key={m} onClick={() => setMode(m)} style={{
+            padding: '7px 22px',
+            border: `1px solid ${mode === m ? 'var(--felt-green)' : 'var(--border-subtle)'}`,
+            borderRadius: 100, cursor: 'pointer',
+            background: mode === m ? 'var(--felt-green)' : 'transparent',
+            color: mode === m ? 'var(--cream,#E4D8C0)' : 'var(--text-muted)',
+            fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, transition: 'all 0.2s'
+          }}>{m === 'login' ? 'כניסה' : 'הרשמה'}</button>
+          )}
+        </div>
+
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {mode === 'register' &&
+          <input className="input-base" value={name} onChange={(e) => setName(e.target.value)}
+          placeholder="איך קוראים לך?" required={mode === 'register'}
+          style={{ textAlign: 'right' }} />
+
+          }
+          <input className="input-base" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+          placeholder="your@email.com" required dir="ltr" />
+          
+
+          <button className="btn btn-primary" type="submit" style={{
+            width: '100%', padding: '15px', fontSize: 15, marginTop: 4,
+            borderRadius: 'var(--radius-pill)',
+            opacity: loading ? 0.7 : 1,
+            boxShadow: '0 6px 24px rgba(30,92,48,0.25)', letterSpacing: '0.02em'
+          }}>
+            {loading ?
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 14, height: 14, border: '2px solid rgba(228,216,192,0.4)', borderTopColor: 'var(--text-primary)', borderRadius: '50%', animation: 'spin-slow 0.7s linear infinite', display: 'inline-block' }} />
+                טוען...
+              </span> :
+            mode === 'login' ? 'כנס למשחק ♠' : 'הצטרף ♠'}
+          </button>
+        </form>
+      </div>
+    </div>);
+
+}
+
+/* ══════════════════════════════════════════════
+   LOBBY
+══════════════════════════════════════════════ */
+function LobbyScreen({ user, onStartSetup, onLogout }) {
+  return (
+    <div className="screen" style={{ minHeight: '100dvh', background: 'var(--bg-void)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+      <FeltCircle />
+
+      {/* Header */}
+      <div style={{ padding: '22px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
+        <div>
+          <div style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.1 }}>שלום, {user.name}</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>מוכן לשחק?</div>
+        </div>
+        <button className="btn-ghost" onClick={onLogout} style={{ padding: '7px 14px', fontSize: 12 }}>יציאה</button>
+      </div>
+
+      {/* CTA */}
+      <div style={{ padding: '28px 20px 0', position: 'relative', zIndex: 1 }}>
+        <button className="btn btn-primary" onClick={onStartSetup} style={{ width: '100%', padding: '20px', fontSize: 19, borderRadius: 'var(--radius-lg)' }}>
+          <Chip size={26} color="#2A7A40" />
+          התחל משחק חדש
+          <span>→</span>
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, position: 'relative', zIndex: 1 }}>
+        {[
+        { label: 'משחקים', val: '12' },
+        { label: 'רווח כולל', val: '+680₪', color: 'var(--text-green)' },
+        { label: 'אחוז זכייה', val: '58%', color: 'var(--text-gold)' }].
+        map((s, i) =>
+        <div key={i} className="card" style={{ padding: '14px 10px', textAlign: 'center' }}>
+            <div style={{ fontSize: 20, fontFamily: 'var(--font-mono)', fontWeight: 700, color: s.color || 'var(--text-primary)' }}>{s.val}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>{s.label}</div>
+          </div>
+        )}
+      </div>
+
+      {/* History */}
+      <div style={{ padding: '0 20px 24px', flex: 1, position: 'relative', zIndex: 1 }}>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>משחקים אחרונים</div>
+        <div className="scroll-area" style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 260 }}>
+          {GAME_HISTORY.map((g, i) =>
+          <div key={g.id} className={`card card-${g.result > 0 ? 'win' : 'lose'}`} style={{
+            padding: '13px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            animation: `slide-up 0.28s ${i * 0.07}s both`
+          }}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>{g.players.join(' · ')}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2, fontFamily: 'var(--font-mono)' }}>
+                  {g.date} · ₪{fmt(g.pot)}
+                </div>
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 17, color: g.result > 0 ? 'var(--text-green)' : 'var(--text-red)' }}>
+                {g.result > 0 ? '+' : ''}{fmt(g.result)}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>);
+
+}
+
+/* ══════════════════════════════════════════════
+   GAME SETUP
+══════════════════════════════════════════════ */
+function GameSetupScreen({ onStartGame, onBack }) {
+  const [players, setPlayers] = useState(['', '', '']);
+  const [buyIn, setBuyIn] = useState(200);
+
+  const addPlayer = () => setPlayers((p) => [...p, '']);
+  const removePlayer = (i) => setPlayers((p) => p.filter((_, idx) => idx !== i));
+  const updatePlayer = (i, v) => setPlayers((p) => p.map((x, idx) => idx === i ? v : x));
+  const canStart = players.filter((p) => p.trim()).length >= 2;
+
+  const handleStart = () => {
+    const valid = players.filter((p) => p.trim()).map((name, i) => ({ id: i, name, chips: buyIn, buyIns: 1 }));
+    onStartGame({ players: valid, buyIn });
+  };
+
+  return (
+    <div className="screen" style={{ minHeight: '100dvh', background: 'var(--bg-void)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--border-subtle)' }}>
+        <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 20, padding: 4, lineHeight: 1 }}>←</button>
+        <div>
+          <div style={{ fontWeight: 800, fontSize: 18 }}>הגדרות משחק</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>שחקנים וקנייה</div>
+        </div>
+      </div>
+
+      <div className="scroll-area" style={{ flex: 1, padding: 20, display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {/* Buy-in */}
+        <div className="card" style={{ padding: 20 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 14 }}>קנייה</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button onClick={() => setBuyIn((b) => Math.max(50, b - 50))} style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', fontSize: 22, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+            <div style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: 42, fontWeight: 700, color: 'var(--text-gold)' }}>₪{fmt(buyIn)}</div>
+            <button onClick={() => setBuyIn((b) => b + 50)} style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', fontSize: 22, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 14, justifyContent: 'center' }}>
+            {[100, 200, 500, 1000].map((v) =>
+            <button key={v} onClick={() => setBuyIn(v)} style={{
+              padding: '6px 12px', borderRadius: 100, border: '1px solid',
+              borderColor: buyIn === v ? 'var(--gold-dim)' : 'var(--border-subtle)',
+              background: buyIn === v ? 'rgba(196,154,44,0.08)' : 'transparent',
+              color: buyIn === v ? 'var(--text-gold)' : 'var(--text-muted)',
+              cursor: 'pointer', fontSize: 13, fontFamily: 'var(--font-mono)', fontWeight: 600, transition: 'all 0.18s'
+            }}>₪{v}</button>
+            )}
+          </div>
+        </div>
+
+        {/* Players */}
+        <div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>
+            שחקנים ({players.filter((p) => p.trim()).length})
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {players.map((p, i) =>
+            <div key={i} className="card card-felt" style={{
+              display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
+              animation: `slide-up 0.22s ${i * 0.04}s both`
+            }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 15, color: 'var(--text-gold)', width: 22, flexShrink: 0 }}>{i + 1}</div>
+                <input value={p} onChange={(e) => updatePlayer(i, e.target.value)}
+              placeholder={`שחקן ${i + 1}`} className="input-base"
+              style={{ border: 'none', background: 'transparent', padding: '4px 0', fontSize: 15, fontFamily: 'var(--font-display)', fontWeight: 600 }} />
+              
+                {players.length > 2 &&
+              <button onClick={() => removePlayer(i)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 18, padding: 4, flexShrink: 0, lineHeight: 1 }}>×</button>
+              }
+              </div>
+            )}
+            <button onClick={addPlayer} style={{
+              width: '100%', padding: '14px', borderRadius: 'var(--radius-sm)',
+              border: '1px dashed rgba(196,154,44,0.2)',
+              background: 'rgba(196,154,44,0.03)',
+              color: 'var(--text-gold)', fontFamily: 'var(--font-display)', fontWeight: 700,
+              cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              transition: 'all 0.18s'
+            }}>＋ הוסף שחקן</button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border-subtle)' }}>
+        <button className="btn btn-primary" onClick={handleStart} disabled={!canStart} style={{
+          width: '100%', padding: '18px', fontSize: 16,
+          opacity: canStart ? 1 : 0.4, cursor: canStart ? 'pointer' : 'not-allowed'
+        }}>כנס למשחק ♠</button>
+      </div>
+    </div>);
+
+}
+
+/* ══════════════════════════════════════════════
+   GAME TABLE
+══════════════════════════════════════════════ */
+function GameTableScreen({ game, onEndGame }) {
+  const [players, setPlayers] = useState(game.players);
+  const [elapsed, setElapsed] = useState(0);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
+
+  useEffect(() => {
+    const t = setInterval(() => setElapsed((e) => e + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const fmtTime = (s) => {
+    const h = Math.floor(s / 3600),m = Math.floor(s % 3600 / 60),sec = s % 60;
+    return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}` : `${m}:${String(sec).padStart(2, '0')}`;
+  };
+
+  const addBuyin = (pid) => setPlayers((ps) => ps.map((p) => p.id === pid ? { ...p, chips: p.chips + game.buyIn, buyIns: p.buyIns + 1 } : p));
+  const totalPot = players.reduce((s, p) => s + p.buyIns * game.buyIn, 0);
+
+  return (
+    <div className="screen" style={{
+      minHeight: '100dvh', position: 'relative', overflow: 'hidden',
+      background: `radial-gradient(ellipse at 50% 55%, rgba(30,92,48,0.07) 0%, var(--bg-void) 65%)`
+    }}>
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'conic-gradient(from 0deg at 50% 50%,transparent 0%,rgba(30,92,48,0.025) 40%,transparent 50%)', animation: 'spin-slow 25s linear infinite' }} />
+      <FeltCircle />
+
+      {/* Header */}
+      <div style={{ position: 'relative', zIndex: 1, padding: '16px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 26, fontWeight: 700, color: 'var(--text-green)' }}>{fmtTime(elapsed)}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>זמן משחק</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 700, color: 'var(--text-gold)' }}>₪{fmt(totalPot)}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>סיר</div>
+        </div>
+        <div style={{ width: 60 }} />
+      </div>
+
+      {/* Players */}
+      <div className="scroll-area" style={{ position: 'relative', zIndex: 1, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 'calc(100dvh - 150px)' }}>
+        {players.map((p, i) =>
+        <div key={p.id} className="card card-felt" style={{
+          padding: '14px 16px', display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'center', gap: 14,
+          animation: `slide-up 0.24s ${i * 0.06}s both`
+        }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <ChipStack count={p.buyIns} size={32} />
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)' }}>{p.buyIns}×</div>
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: i === 0 ? 'var(--text-gold)' : 'var(--text-primary)' }}>{p.name || `שחקן ${p.id + 1}`}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 700, color: 'var(--text-green)', marginTop: 2 }}>
+                ₪{fmt(p.chips)}
+              </div>
+            </div>
+            <button onClick={() => addBuyin(p.id)} style={{
+            padding: '8px 12px', borderRadius: 'var(--radius-pill)',
+            background: 'rgba(184,106,26,0.12)', border: '1px solid rgba(184,106,26,0.25)',
+            color: 'var(--amber)', fontFamily: 'var(--font-display)', fontWeight: 700,
+            cursor: 'pointer', fontSize: 12, transition: 'all 0.18s', whiteSpace: 'nowrap'
+          }}>+ קנייה</button>
+          </div>
+        )}
+      </div>
+
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '16px 20px', background: `linear-gradient(transparent, var(--bg-void) 45%)`, zIndex: 10 }}>
+        <button className="btn btn-danger" onClick={() => setShowEndConfirm(true)} style={{ width: '100%', padding: '15px', fontSize: 15 }}>סיים משחק
+
+        </button>
+      </div>
+
+      {/* End confirm */}
+      {showEndConfirm &&
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.82)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, backdropFilter: 'blur(5px)' }}>
+          <div className="card" style={{ width: '100%', maxWidth: 300, padding: 28, animation: 'scale-in 0.2s ease' }}>
+            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 8 }}>לסיים את המשחק?</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>תועברו לספירת הצ'יפים</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="btn-ghost" onClick={() => setShowEndConfirm(false)} style={{ flex: 1, padding: '13px', fontSize: 14 }}>המשך</button>
+              <button className="btn btn-danger" onClick={() => onEndGame(players)} style={{ flex: 1, padding: '13px', fontSize: 14 }}>סיים</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>);
+
+}
+
+/* ══════════════════════════════════════════════
+   END GAME — CHIP COUNT (chips, not ₪)
+══════════════════════════════════════════════ */
+function EndGameScreen({ game, players, onCalculate }) {
+  const [counts, setCounts] = useState(() => Object.fromEntries(players.map((p) => [p.id, ''])));
+
+  const totalChips = players.reduce((s, p) => s + p.buyIns, 0) * game.buyIn;
+  const enteredSum = Object.values(counts).reduce((s, v) => s + (+v || 0), 0);
+  const diff = enteredSum - totalChips;
+  const allFilled = players.every((p) => counts[p.id] !== '');
+  const isValid = Math.abs(diff) < 0.5;
+
+  const handleCalc = () => {
+    if (!allFilled) return;
+    const results = players.map((p) => {
+      const chips = +counts[p.id] || 0;
+      const spent = p.buyIns * game.buyIn;
+      return { ...p, finalChips: chips, profit: chips - spent };
+    });
+    onCalculate(results);
+  };
+
+  return (
+    <div className="screen" style={{ minHeight: '100dvh', background: 'var(--bg-void)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '20px 20px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{ fontWeight: 800, fontSize: 20 }}>ספירת צ'יפים</div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>כמה צ'יפים יש לכל שחקן?</div>
+      </div>
+
+      {/* Running total */}
+      <div style={{ padding: '14px 20px' }}>
+        <div className="card" style={{
+          padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          transition: 'all 0.3s',
+          borderTopColor: allFilled ? isValid ? 'var(--gold-dim)' : 'var(--crimson)' : 'var(--border-subtle)',
+          boxShadow: allFilled ? isValid ? 'var(--shadow-gold)' : 'var(--shadow-red)' : 'var(--shadow-card)'
+        }}>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>סה"כ לשולחן</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 700, color: 'var(--text-gold)' }}>₪{fmt(totalChips)}</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700,
+              color: !allFilled ? 'var(--text-muted)' : isValid ? 'var(--text-green)' : 'var(--text-red)' }}>
+              {!allFilled ? 'ממתין...' : isValid ? '✓ תקין' : `פער ${diff > 0 ? '+' : ''}${fmt(diff)}`}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>הוזן</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 700,
+              color: !allFilled ? 'var(--text-muted)' : isValid ? 'var(--text-green)' : 'var(--text-red)' }}>
+              ₪{fmt(enteredSum)}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="scroll-area" style={{ flex: 1, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {players.map((p, i) =>
+        <div key={p.id} className="card card-felt" style={{ padding: '14px 16px', animation: `slide-up 0.22s ${i * 0.05}s both` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 5 }}>{p.name || `שחקן ${p.id + 1}`}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                  {p.buyIns} × קנייה · ₪{fmt(p.buyIns * game.buyIn)}
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <button onClick={() => setCounts((c) => ({ ...c, [p.id]: Math.max(0, (+c[p.id] || 0) - 50) }))}
+              style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>−</button>
+                <div style={{ position: 'relative' }}>
+                  <input type="number" value={counts[p.id]} dir="ltr"
+                onChange={(e) => setCounts((c) => ({ ...c, [p.id]: e.target.value }))}
+                placeholder="0"
+                style={{
+                  width: 86, padding: '8px 10px', fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 18,
+                  background: 'var(--bg-elevated)',
+                  border: `1px solid ${counts[p.id] !== '' ? 'var(--gold-dim)' : 'var(--border-subtle)'}`,
+                  borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', outline: 'none', textAlign: 'center',
+                  transition: 'border-color 0.2s'
+                }} />
+                
+                  <div style={{ position: 'absolute', bottom: -16, left: 0, right: 0, textAlign: 'center', fontSize: 9, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>צ'יפים</div>
+                </div>
+                <button onClick={() => setCounts((c) => ({ ...c, [p.id]: (+c[p.id] || 0) + 50 }))}
+              style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>+</button>
+              </div>
+            </div>
+          </div>
+        )}
+        <div style={{ height: 10 }} />
+      </div>
+
+      <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border-subtle)' }}>
+        <button className="btn btn-gold" onClick={handleCalc} disabled={!allFilled || !isValid} style={{
+          width: '100%', padding: '18px', fontSize: 16, borderRadius: 'var(--radius-pill)',
+          opacity: allFilled && isValid ? 1 : 0.35, cursor: allFilled && isValid ? 'pointer' : 'not-allowed'
+        }}>🏆  חשב תוצאות</button>
+      </div>
+    </div>);
+
+}
+
+/* ══════════════════════════════════════════════
+   RESULTS
+══════════════════════════════════════════════ */
+function SettlementScreen({ results, game, onPlayAgain }) {
+  const [showConfetti, setShowConfetti] = useState(false);
+  const sorted = [...results].sort((a, b) => b.profit - a.profit);
+
+  useEffect(() => {setTimeout(() => setShowConfetti(true), 400);}, []);
+
+  // Settle debts
+  const ws = results.filter((p) => p.profit > 0).map((p) => ({ ...p, rem: p.profit }));
+  const ls = results.filter((p) => p.profit < 0).map((p) => ({ ...p, rem: -p.profit }));
+  const debts = [];let wi = 0,li = 0;
+  while (wi < ws.length && li < ls.length) {
+    const amt = Math.min(ws[wi].rem, ls[li].rem);
+    if (amt > 0.5) debts.push({ from: ls[li].name || `שחקן ${ls[li].id + 1}`, to: ws[wi].name || `שחקן ${ws[wi].id + 1}`, amount: amt });
+    ws[wi].rem -= amt;ls[li].rem -= amt;
+    if (ws[wi].rem < 0.5) wi++;if (ls[li].rem < 0.5) li++;
+  }
+
+  const totalPot = results.reduce((s, p) => s + p.buyIns * game.buyIn, 0);
+
+  return (
+    <div className="screen" style={{ minHeight: '100dvh', background: 'var(--bg-void)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Confetti active={showConfetti} />
+
+      <div style={{ padding: '20px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ fontWeight: 800, fontSize: 20 }}>תוצאות המשחק</div>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(196,154,44,0.08)', border: '1px solid var(--border-active)', borderRadius: 100, padding: '5px 14px' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-gold)', fontSize: 15 }}>₪{fmt(totalPot)}</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>סיר</span>
+        </div>
+      </div>
+
+      <div className="scroll-area" style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {sorted.map((p, i) => {
+          const isWin = p.profit > 0,isTop = i === 0;
+          return (
+            <div key={p.id} className={`card ${isWin ? 'card-win' : 'card-lose'}`} style={{
+              padding: '16px 18px',
+              boxShadow: isTop ? 'var(--shadow-gold)' : isWin ? 'var(--shadow-felt)' : 'var(--shadow-red)',
+              animation: `slide-up 0.28s ${i * 0.07}s both`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 3 }}>
+                    <span style={{ fontWeight: 800, fontSize: 16, color: isTop ? 'var(--text-gold)' : 'var(--text-primary)' }}>{p.name || `שחקן ${p.id + 1}`}</span>
+                    <span style={{
+                      fontSize: 11, padding: '2px 9px', borderRadius: 100, fontWeight: 700,
+                      background: isTop ? 'rgba(196,154,44,0.12)' : isWin ? 'rgba(30,92,48,0.14)' : 'rgba(139,32,32,0.14)',
+                      color: isTop ? 'var(--text-gold)' : isWin ? 'var(--text-green)' : 'var(--text-red)'
+                    }}>{isTop ? 'כריש 🦈' : isWin ? 'מנצח' : 'דג 🐟'}</span>
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)' }}>
+                    הכניס ₪{fmt(p.buyIns * game.buyIn)} · יצא {fmt(p.finalChips)} צ'יפים
+                  </div>
+                </div>
+                <div style={{
+                  fontFamily: 'var(--font-mono)', fontWeight: 800,
+                  fontSize: isTop ? 30 : 24,
+                  color: isTop ? 'var(--text-gold)' : isWin ? 'var(--text-green)' : 'var(--text-red)'
+                }}>
+                  {p.profit > 0 ? '+' : ''}{fmt(p.profit)}₪
+                </div>
+              </div>
+            </div>);
+
+        })}
+
+        {/* Debts */}
+        {debts.length > 0 &&
+        <div style={{ marginTop: 6 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>העברות</div>
+            <div className="card" style={{ padding: '2px 0' }}>
+              {debts.map((d, i) =>
+            <div key={i} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '13px 16px',
+              borderBottom: i < debts.length - 1 ? '1px solid var(--border-subtle)' : 'none'
+            }}>
+                  <span style={{ fontWeight: 700, color: 'var(--text-red)', fontSize: 14 }}>{d.from}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, justifyContent: 'center' }}>
+                    <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg,var(--crimson),transparent)', opacity: 0.3 }} />
+                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-gold)', fontSize: 14 }}>₪{fmt(d.amount)}</span>
+                    <div style={{ height: 1, flex: 1, background: 'linear-gradient(90deg,transparent,var(--felt-green))', opacity: 0.3 }} />
+                  </div>
+                  <span style={{ fontWeight: 700, color: 'var(--text-green)', fontSize: 14 }}>{d.to}</span>
+                </div>
+            )}
+            </div>
+          </div>
+        }
+      </div>
+
+      <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border-subtle)' }}>
+        <button className="btn btn-primary" onClick={() => {setShowConfetti(true);setTimeout(onPlayAgain, 700);}} style={{ width: '100%', padding: '17px', fontSize: 16 }}>
+          ♠  משחק נוסף
+        </button>
+      </div>
+    </div>);
+
+}
+
+/* ── WELCOME ── */
+function WelcomeModal({ onClose }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.82)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, backdropFilter: 'blur(6px)' }}>
+      <div className="card" style={{ width: '100%', maxWidth: 290, padding: 30, textAlign: 'center', animation: 'scale-in 0.28s ease', boxShadow: 'var(--shadow-gold)', borderTopColor: 'var(--gold-dim)' }}>
+        <div style={{ fontSize: 40, marginBottom: 12, animation: 'float 2.5s ease-in-out infinite' }}>♠</div>
+        <div style={{ fontWeight: 800, fontSize: 20, marginBottom: 6 }}>ברוך הבא!</div>
+        <div style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 22, lineHeight: 1.6 }}>מוכן לנהל את המשחק<br />בסגנון?</div>
+        <button className="btn btn-primary" onClick={onClose} style={{ width: '100%', padding: '13px', fontSize: 14 }}>יאללה נתחיל ♠</button>
+      </div>
+    </div>);
+
+}
+
+/* ── TWEAKS ── */
+function TweaksPanel({ tweaks, onChange }) {
+  return (
+    <div className="tweaks-panel">
+      <div className="tweaks-title">⚙ Tweaks</div>
+      <label>צבע שולחן</label>
+      <select value={tweaks.tableColor} onChange={(e) => onChange({ ...tweaks, tableColor: e.target.value })}>
+        <option value="green">ירוק פלט</option>
+        <option value="burgundy">בורדו</option>
+        <option value="navy">כחול לילה</option>
+      </select>
+      <label>צפיפות</label>
+      <select value={tweaks.density} onChange={(e) => onChange({ ...tweaks, density: e.target.value })}>
+        <option value="comfortable">נוח</option>
+        <option value="compact">קומפקטי</option>
+      </select>
+    </div>);
+
+}
+
+/* ══════════════════════════════════════════════
+   APP
+══════════════════════════════════════════════ */
+function App() {
+  const [screen, setScreen] = useState('auth');
+  const [user, setUser] = useState(null);
+  const [game, setGame] = useState(null);
+  const [gamePlayers, setGamePlayers] = useState(null);
+  const [finalResults, setFinalResults] = useState(null);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [tweaksVis, setTweaksVis] = useState(false);
+  const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+
+  useEffect(() => {
+    const h = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweaksVis(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweaksVis(false);
+    };
+    window.addEventListener('message', h);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', h);
+  }, []);
+
+  const handleTweakChange = (t) => {
+    setTweaks(t);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: t }, '*');
+  };
+
+  const DEV_GAME = { players: [{ id: 0, name: 'דנה', chips: 200, buyIns: 1 }, { id: 1, name: 'יוסי', chips: 200, buyIns: 1 }, { id: 2, name: 'שרה', chips: 200, buyIns: 1 }], buyIn: 200 };
+  const DEV_RESULTS = [{ id: 0, name: 'דנה', buyIns: 1, finalChips: 350, profit: 150 }, { id: 1, name: 'יוסי', buyIns: 1, finalChips: 200, profit: 0 }, { id: 2, name: 'שרה', buyIns: 1, finalChips: 50, profit: -150 }];
+
+  return (
+    <div style={{ width: '100%', height: '100dvh', overflow: 'hidden', position: 'relative' }}>
+      {screen === 'auth' && <AuthScreen onLogin={(u) => {setUser(u);setShowWelcome(true);setScreen('lobby');}} />}
+      {screen === 'lobby' && <LobbyScreen user={user} onStartSetup={() => setScreen('setup')} onLogout={() => {setUser(null);setScreen('auth');}} />}
+      {screen === 'setup' && <GameSetupScreen onStartGame={(g) => {setGame(g);setScreen('table');}} onBack={() => setScreen('lobby')} />}
+      {screen === 'table' && <GameTableScreen game={game} onEndGame={(ps) => {setGamePlayers(ps);setScreen('endgame');}} />}
+      {screen === 'endgame' && <EndGameScreen game={game} players={gamePlayers} onCalculate={(r) => {setFinalResults(r);setScreen('results');}} />}
+      {screen === 'results' && <SettlementScreen results={finalResults} game={game} onPlayAgain={() => {setGame(null);setGamePlayers(null);setFinalResults(null);setScreen('lobby');}} />}
+
+      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
+      {tweaksVis && <TweaksPanel tweaks={tweaks} onChange={handleTweakChange} />}
+
+      {/* Dev nav dots */}
+      <div style={{ position: 'fixed', bottom: 12, right: 12, display: 'flex', gap: 5, zIndex: 9990 }}>
+        {['auth', 'lobby', 'setup', 'table', 'endgame', 'results'].map((s) =>
+        <button key={s} onClick={() => {
+          if (!user) setUser({ name: 'שחקן', email: 'x@x.com' });
+          if ((s === 'table' || s === 'endgame') && !game) setGame(DEV_GAME);
+          if (s === 'endgame' && !gamePlayers) setGamePlayers(DEV_GAME.players);
+          if (s === 'results' && !finalResults) {setGame(DEV_GAME);setFinalResults(DEV_RESULTS);}
+          setScreen(s);
+        }} style={{
+          width: 7, height: 7, borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0,
+          background: screen === s ? 'var(--gold)' : 'rgba(255,255,255,0.15)',
+          transition: 'all 0.2s'
+        }} />
+        )}
+      </div>
+    </div>);
+
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

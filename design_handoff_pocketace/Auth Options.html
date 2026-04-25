@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PocketAce — Auth Screen Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#111; font-family:'Syne',sans-serif; }
+
+  /* Shared tokens */
+  .a { --bg: #08070A; --bg2: #18140F; --bg3: #201A13; --bg4: #2A2018;
+       --gold: #C49A2C; --gold2: #D4AA3C; --golddim: #8A6B1C;
+       --felt: #1E5C30; --felt2: #2A7A40;
+       --cream: #E4D8C0; --muted: rgba(228,216,192,0.42);
+       --border: rgba(196,154,44,0.10); --borderact: rgba(196,154,44,0.28); }
+
+  /* Grain texture */
+  .grain::after {
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:100;
+    opacity:0.055;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:200px 200px; border-radius:inherit;
+  }
+
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+  @keyframes fade-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ── SHARED ── */
+const GOLD='#C49A2C', GOLD2='#D4AA3C', GOLDDIM='#8A6B1C';
+const FELT='#1E5C30', FELT2='#2A7A40';
+const BG='#08070A', BG2='#18140F', BG3='#201A13', BG4='#2A2018';
+const CREAM='#E4D8C0', MUTED='rgba(228,216,192,0.42)';
+const BORDER='rgba(196,154,44,0.10)', BORDERACT='rgba(196,154,44,0.28)';
+
+function EmailInput({ placeholder="your@email.com", style={} }) {
+  const [val, setVal] = useState('');
+  const [focused, setFocused] = useState(false);
+  return (
+    <input
+      type="email" value={val} onChange={e=>setVal(e.target.value)}
+      placeholder={placeholder} dir="ltr"
+      onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)}
+      style={{
+        width:'100%', padding:'13px 14px',
+        background: BG3,
+        border:`1px solid ${focused?GOLDDIM:BORDER}`,
+        borderRadius:8,
+        color: CREAM, fontFamily:"'IBM Plex Mono',monospace", fontSize:14,
+        outline:'none', transition:'border-color 0.2s, box-shadow 0.2s',
+        boxShadow: focused?`0 0 0 3px rgba(196,154,44,0.08)`:'none',
+        ...style,
+      }}
+    />
+  );
+}
+
+/* ══════════════════════════════════════════
+   OPTION A — Minimal Centered
+   Clean, nothing fancy — focus on the form.
+══════════════════════════════════════════ */
+function OptionA() {
+  const [mode, setMode] = useState('login');
+  return (
+    <div style={{width:375,height:700,background:BG,position:'relative',overflow:'hidden',borderRadius:2}} className="grain a">
+      {/* Subtle radial behind card */}
+      <div style={{position:'absolute',left:'50%',top:'48%',transform:'translate(-50%,-50%)',
+        width:300,height:300,borderRadius:'50%',
+        background:`radial-gradient(circle, rgba(30,92,48,0.07) 0%, transparent 70%)`,
+        pointerEvents:'none'}}/>
+
+      {/* Floating suit corners */}
+      {['♠','♣'].map((s,i)=>(
+        <div key={i} style={{
+          position:'absolute', fontSize:70, fontFamily:'serif',
+          color:`rgba(196,154,44,0.05)`,
+          top:i===0?'5%':'72%', left:i===0?'4%':'78%',
+          animation:`float ${3.5+i}s ease-in-out infinite`, animationDelay:`${i*0.8}s`,
+          userSelect:'none',
+        }}>{s}</div>
+      ))}
+
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:28,gap:0}}>
+        {/* Logo */}
+        <div style={{textAlign:'center',marginBottom:32,animation:'fade-up 0.4s ease both'}}>
+          <div style={{
+            fontSize:46, fontWeight:800, letterSpacing:'-0.02em',
+            background:`linear-gradient(135deg, ${GOLDDIM} 0%, ${GOLD2} 45%, ${GOLD} 70%, ${GOLDDIM} 100%)`,
+            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+          }}>♠ PocketAce</div>
+          <div style={{color:MUTED,fontSize:11,marginTop:7,letterSpacing:'0.2em',textTransform:'uppercase'}}>ניהול פוקר</div>
+        </div>
+
+        {/* Card */}
+        <div style={{
+          width:'100%', background:BG2, border:`1px solid ${BORDER}`,
+          borderRadius:16, padding:24, position:'relative', overflow:'hidden',
+          boxShadow:'0 8px 40px rgba(0,0,0,0.5), 0 1px 0 rgba(196,154,44,0.06)',
+          animation:'fade-up 0.4s 0.1s ease both',
+        }}>
+          <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${GOLDDIM},transparent)`,opacity:0.4}}/>
+
+          {/* Toggle */}
+          <div style={{display:'flex',background:BG3,borderRadius:100,padding:3,marginBottom:20}}>
+            {['login','register'].map(m=>(
+              <button key={m} onClick={()=>setMode(m)} style={{
+                flex:1,padding:'8px 0',border:'none',cursor:'pointer',borderRadius:100,
+                fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:13,transition:'all 0.2s',
+                background:mode===m?FELT:'transparent',
+                color:mode===m?CREAM:MUTED,
+              }}>{m==='login'?'כניסה':'הרשמה'}</button>
+            ))}
+          </div>
+
+          <div style={{display:'flex',flexDirection:'column',gap:12}}>
+            {mode==='register'&&(
+              <div>
+                <div style={{fontSize:10,color:MUTED,letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:5}}>שם</div>
+                <EmailInput placeholder="איך קוראים לך?"/>
+              </div>
+            )}
+            <div>
+              <div style={{fontSize:10,color:MUTED,letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:5}}>אימייל</div>
+              <EmailInput/>
+            </div>
+            <button style={{
+              width:'100%',padding:'14px',marginTop:4,border:'none',borderRadius:100,
+              background:FELT,color:CREAM,fontFamily:"'Syne',sans-serif",fontWeight:700,
+              fontSize:15,cursor:'pointer',
+              boxShadow:'0 4px 20px rgba(30,92,48,0.2)',
+              transition:'all 0.18s',
+            }}>
+              {mode==='login'?'♠  כנס למשחק':'♠  צור חשבון'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   OPTION B — Dramatic Table
+   Giant felt circle dominates. Card floats
+   centered on the "table". Moody & cinematic.
+══════════════════════════════════════════ */
+function OptionB() {
+  const [mode, setMode] = useState('login');
+  return (
+    <div style={{width:375,height:700,background:BG,position:'relative',overflow:'hidden',borderRadius:2}} className="grain a">
+      {/* Giant table */}
+      <div style={{
+        position:'absolute', left:'50%', top:'48%',
+        transform:'translate(-50%,-50%)',
+        width:520, height:520, borderRadius:'50%',
+        background:`radial-gradient(circle at 38% 38%, rgba(30,92,48,0.14) 0%, rgba(30,92,48,0.06) 40%, transparent 70%)`,
+        border:`1px solid rgba(30,92,48,0.14)`,
+        boxShadow:'inset 0 0 60px rgba(0,0,0,0.3)',
+      }}>
+        <div style={{position:'absolute',inset:28,borderRadius:'50%',border:`1px solid rgba(30,92,48,0.08)`}}/>
+        <div style={{position:'absolute',inset:60,borderRadius:'50%',border:`1px dashed rgba(196,154,44,0.05)`}}/>
+      </div>
+
+      {/* Suit symbols on table */}
+      {['♠','♥','♦','♣'].map((s,i)=>(
+        <div key={i} style={{
+          position:'absolute', fontSize:28, fontFamily:'serif',
+          color:`rgba(196,154,44,0.10)`,
+          top:[`16%`,`68%`,`22%`,`64%`][i],
+          left:[`14%`,`72%`,`72%`,`14%`][i],
+          animation:`float ${3+i*0.6}s ease-in-out infinite`, animationDelay:`${i*0.4}s`,
+          userSelect:'none',
+        }}>{s}</div>
+      ))}
+
+      {/* Content floats on top of table */}
+      <div style={{position:'relative',zIndex:2,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'28px 24px',gap:0}}>
+        <div style={{textAlign:'center',marginBottom:28}}>
+          <div style={{
+            fontSize:50,fontWeight:800,letterSpacing:'-0.03em',lineHeight:0.9,
+            background:`linear-gradient(135deg, ${GOLDDIM} 0%, ${GOLD2} 50%, ${GOLDDIM} 100%)`,
+            WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+          }}>POCKET<br/>ACE</div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginTop:10}}>
+            <div style={{height:1,width:40,background:`linear-gradient(90deg,transparent,${GOLDDIM})`}}/>
+            <div style={{color:MUTED,fontSize:10,letterSpacing:'0.2em',textTransform:'uppercase'}}>ניהול פוקר</div>
+            <div style={{height:1,width:40,background:`linear-gradient(90deg,${GOLDDIM},transparent)`}}/>
+          </div>
+        </div>
+
+        <div style={{width:'100%',maxWidth:300}}>
+          {/* Mode toggle — pill */}
+          <div style={{display:'flex',justifyContent:'center',gap:6,marginBottom:20}}>
+            {['login','register'].map(m=>(
+              <button key={m} onClick={()=>setMode(m)} style={{
+                padding:'7px 22px',border:`1px solid ${mode===m?FELT:BORDER}`,
+                borderRadius:100,cursor:'pointer',
+                background:mode===m?FELT:'transparent',
+                color:mode===m?CREAM:MUTED,
+                fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:13,transition:'all 0.2s',
+              }}>{m==='login'?'כניסה':'הרשמה'}</button>
+            ))}
+          </div>
+
+          <div style={{display:'flex',flexDirection:'column',gap:10}}>
+            {mode==='register'&&<EmailInput placeholder="שם"/>}
+            <EmailInput/>
+            <button style={{
+              width:'100%',padding:'15px',border:'none',borderRadius:100,
+              background:`linear-gradient(135deg, ${FELT} 0%, ${FELT2} 100%)`,
+              color:CREAM,fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:15,cursor:'pointer',
+              boxShadow:'0 6px 24px rgba(30,92,48,0.25)',letterSpacing:'0.02em',
+            }}>
+              {mode==='login'?'כנס למשחק ♠':'הצטרף ♠'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   OPTION C — Split / Editorial
+   Top third: bold gold logo on dark felt.
+   Bottom two thirds: form on lighter panel.
+══════════════════════════════════════════ */
+function OptionC() {
+  const [mode, setMode] = useState('login');
+  return (
+    <div style={{width:375,height:700,background:BG,position:'relative',overflow:'hidden',borderRadius:2}} className="grain a">
+      {/* Top hero panel */}
+      <div style={{
+        position:'absolute', top:0, left:0, right:0, height:240,
+        background:`linear-gradient(160deg, ${BG} 0%, rgba(30,92,48,0.15) 60%, ${BG} 100%)`,
+        borderBottom:`1px solid rgba(196,154,44,0.10)`,
+        display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+        overflow:'hidden',
+      }}>
+        {/* Large card suit bg decoration */}
+        <div style={{position:'absolute',fontSize:180,fontFamily:'serif',color:'rgba(196,154,44,0.04)',top:'-20px',left:'50%',transform:'translateX(-50%)',userSelect:'none',lineHeight:1}}>♠</div>
+
+        <div style={{position:'relative',zIndex:1,textAlign:'center'}}>
+          <div style={{
+            fontSize:42,fontWeight:800,letterSpacing:'-0.01em',lineHeight:1,
+            background:`linear-gradient(135deg, ${GOLDDIM} 0%, ${GOLD2} 40%, ${GOLD} 70%, ${GOLDDIM} 100%)`,
+            WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+          }}>♠ PocketAce</div>
+          <div style={{color:MUTED,fontSize:11,marginTop:8,letterSpacing:'0.18em',textTransform:'uppercase'}}>Underground Poker</div>
+        </div>
+      </div>
+
+      {/* Bottom form panel */}
+      <div style={{
+        position:'absolute', bottom:0, left:0, right:0, top:220,
+        background:BG2,
+        borderTop:`1px solid rgba(196,154,44,0.12)`,
+        borderRadius:'20px 20px 0 0',
+        padding:'28px 24px',
+        display:'flex',flexDirection:'column',
+      }}>
+        <div style={{position:'absolute',top:0,left:'50%',transform:'translateX(-50%)',width:40,height:3,background:`rgba(196,154,44,0.2)`,borderRadius:2,marginTop:8}}/>
+
+        <div style={{fontSize:20,fontWeight:800,marginBottom:6}}>
+          {mode==='login'?'שלום, כנס':'צור חשבון'}
+        </div>
+        <div style={{fontSize:13,color:MUTED,marginBottom:22}}>
+          {mode==='login'?'הכנס את האימייל שלך להמשך':'הרשם תוך שניות'}
+        </div>
+
+        <div style={{display:'flex',flexDirection:'column',gap:12,flex:1}}>
+          {mode==='register'&&(
+            <div>
+              <div style={{fontSize:10,color:MUTED,letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:5}}>שם</div>
+              <EmailInput placeholder="איך קוראים לך?"/>
+            </div>
+          )}
+          <div>
+            <div style={{fontSize:10,color:MUTED,letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:5}}>כתובת אימייל</div>
+            <EmailInput/>
+          </div>
+
+          <button style={{
+            width:'100%',padding:'15px',border:'none',borderRadius:100,
+            background:FELT,color:CREAM,
+            fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:15,cursor:'pointer',
+            boxShadow:'0 4px 20px rgba(30,92,48,0.22)',
+            letterSpacing:'0.01em', marginTop:4,
+          }}>
+            {mode==='login'?'המשך ♠':'הצטרף ♠'}
+          </button>
+
+          <div style={{display:'flex',alignItems:'center',gap:10,marginTop:4}}>
+            <div style={{height:1,flex:1,background:BORDER}}/>
+            <span style={{color:MUTED,fontSize:12}}>או</span>
+            <div style={{height:1,flex:1,background:BORDER}}/>
+          </div>
+
+          <button onClick={()=>setMode(m=>m==='login'?'register':'login')} style={{
+            width:'100%',padding:'13px',border:`1px solid ${BORDER}`,borderRadius:100,
+            background:'transparent',color:MUTED,
+            fontFamily:"'Syne',sans-serif",fontWeight:600,fontSize:14,cursor:'pointer',
+            transition:'all 0.18s',
+          }}>
+            {mode==='login'?'עדיין אין לי חשבון':'כבר יש לי חשבון'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   OPTION D — Bold / Typographic
+   Full-bleed typographic logo fills top half.
+   Stark, editorial. Form is secondary.
+══════════════════════════════════════════ */
+function OptionD() {
+  const [mode, setMode] = useState('login');
+  return (
+    <div style={{width:375,height:700,background:BG,position:'relative',overflow:'hidden',borderRadius:2}} className="grain a">
+
+      {/* BG texture stripes — subtle diagonal */}
+      <div style={{position:'absolute',inset:0,pointerEvents:'none',
+        backgroundImage:`repeating-linear-gradient(135deg, rgba(196,154,44,0.012) 0px, rgba(196,154,44,0.012) 1px, transparent 1px, transparent 28px)`,
+      }}/>
+
+      {/* Left accent bar */}
+      <div style={{position:'absolute',top:0,bottom:0,left:0,width:3,background:`linear-gradient(180deg,transparent,${FELT},${GOLD},${FELT},transparent)`}}/>
+
+      <div style={{display:'flex',flexDirection:'column',height:'100%',padding:'44px 28px 28px',position:'relative',zIndex:1}}>
+        {/* Hero type */}
+        <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'flex-start'}}>
+          <div style={{fontSize:11,color:MUTED,letterSpacing:'0.25em',textTransform:'uppercase',marginBottom:16}}>
+            ♠ &nbsp; POKER MANAGEMENT
+          </div>
+          <div style={{
+            fontSize:68,fontWeight:800,lineHeight:0.92,letterSpacing:'-0.04em',
+            color:CREAM,
+          }}>
+            POCKET<br/>
+            <span style={{
+              background:`linear-gradient(90deg, ${GOLD} 0%, ${GOLD2} 50%, ${GOLDDIM} 100%)`,
+              WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            }}>ACE</span>
+          </div>
+          <div style={{
+            marginTop:16, height:2, width:60,
+            background:`linear-gradient(90deg,${FELT},${FELT2})`,
+            borderRadius:1,
+          }}/>
+          <div style={{marginTop:14,fontSize:13,color:MUTED,lineHeight:1.6,maxWidth:240}}>
+            ניהול שולחן, קנייות, ועדכוני יתרה — הכל במקום אחד.
+          </div>
+        </div>
+
+        {/* Form — compact, minimal */}
+        <div style={{borderTop:`1px solid ${BORDER}`,paddingTop:22}}>
+          <div style={{fontSize:13,fontWeight:700,color:CREAM,marginBottom:14}}>
+            {mode==='login'?'כנס עם האימייל שלך':'הרשם'}
+          </div>
+          {mode==='register'&&<div style={{marginBottom:10}}><EmailInput placeholder="שם"/></div>}
+          <div style={{display:'flex',gap:8}}>
+            <EmailInput style={{borderRadius:8}}/>
+            <button style={{
+              padding:'0 18px',border:'none',borderRadius:8,flexShrink:0,
+              background:FELT,color:CREAM,fontFamily:"'Syne',sans-serif",
+              fontWeight:700,fontSize:14,cursor:'pointer',whiteSpace:'nowrap',
+              boxShadow:'0 3px 14px rgba(30,92,48,0.2)',
+            }}>→</button>
+          </div>
+
+          <button onClick={()=>setMode(m=>m==='login'?'register':'login')} style={{
+            marginTop:14,background:'none',border:'none',color:MUTED,fontSize:12,
+            cursor:'pointer',fontFamily:"'Syne',sans-serif",padding:0,
+            textDecoration:'underline',textDecorationColor:'rgba(228,216,192,0.15)',
+          }}>
+            {mode==='login'?'עדיין אין לי חשבון →':'יש לי כבר חשבון →'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   CANVAS
+══════════════════════════════════════════ */
+function App() {
+  return (
+    <DesignCanvas title="PocketAce — Auth Screen Options">
+      <DCSection id="auth-options" title="Login Screen">
+        <DCArtboard id="a" label="A — Minimal Centered" width={375} height={700}><OptionA/></DCArtboard>
+        <DCArtboard id="b" label="B — Felt Table" width={375} height={700}><OptionB/></DCArtboard>
+        <DCArtboard id="c" label="C — Split Panel" width={375} height={700}><OptionC/></DCArtboard>
+        <DCArtboard id="d" label="D — Bold Type" width={375} height={700}><OptionD/></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

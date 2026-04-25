@@ -1,0 +1,144 @@
+<style>
+  body { direction: rtl; }
+  .phone-frame {
+    width: 210px;
+    background: #0a0a14;
+    border-radius: 28px;
+    border: 2px solid rgba(255,255,255,0.12);
+    padding: 16px 12px;
+    font-family: 'Segoe UI', sans-serif;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    direction: rtl;
+    min-height: 160px;
+  }
+  .section-label {
+    font-size: 9px; color: rgba(255,255,255,0.35);
+    letter-spacing: 1px; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .edit-btn {
+    font-size: 9px; color: rgba(245,197,24,0.7);
+    background: none; border: none; cursor: pointer; padding: 0;
+  }
+  .crew-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .crew-member { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; }
+  .crew-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .crew-name { font-size: 8px; color: rgba(255,255,255,0.5); }
+  .crew-add {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1.5px dashed rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: rgba(255,255,255,0.25);
+  }
+  .remove-badge {
+    position: absolute; top: -3px; left: -3px;
+    background: #e74c3c; border-radius: 50%;
+    width: 14px; height: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: #fff; font-weight: 900; line-height: 1;
+  }
+  .shake {
+    animation: shake 0.4s infinite alternate;
+  }
+  @keyframes shake {
+    0% { transform: rotate(-2deg); }
+    100% { transform: rotate(2deg); }
+  }
+  .long-press-ring {
+    box-shadow: 0 0 0 3px rgba(231,76,60,0.5), 0 0 16px rgba(231,76,60,0.3);
+  }
+  .tooltip {
+    position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+    background: rgba(231,76,60,0.9); color: #fff;
+    font-size: 7px; padding: 2px 5px; border-radius: 4px; white-space: nowrap;
+  }
+  .caption {
+    font-size: 10px; color: rgba(255,255,255,0.4); text-align: center;
+    margin-top: 8px; max-width: 210px; line-height: 1.4;
+  }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+</style>
+
+<h2>איך מנהלים את הרשימה?</h2>
+<p class="subtitle">הוספה והסרה של קבועים</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>כפתור עריכה</h3>
+      <p>כפתור "ערוך" קטן ליד הכותרת — לוחץ עליו ועוברים למצב עריכה עם X על כל שחקן</p>
+      <div class="col" style="margin-top:10px;">
+        <div class="phone-frame">
+          <div class="section-label">
+            החבר׳ה הקבועים
+            <span class="edit-btn">✏️ ערוך</span>
+          </div>
+          <div class="crew-row">
+            <div class="crew-member">
+              <div class="crew-avatar shake" style="background:linear-gradient(135deg,#e74c3c,#c0392b)">🤙
+                <span class="remove-badge">✕</span>
+              </div>
+              <span class="crew-name">דני</span>
+            </div>
+            <div class="crew-member">
+              <div class="crew-avatar shake" style="background:linear-gradient(135deg,#3498db,#2980b9)">😎
+                <span class="remove-badge">✕</span>
+              </div>
+              <span class="crew-name">יוסי</span>
+            </div>
+            <div class="crew-member">
+              <div class="crew-avatar shake" style="background:linear-gradient(135deg,#2ecc71,#27ae60)">🦈
+                <span class="remove-badge">✕</span>
+              </div>
+              <span class="crew-name">רון</span>
+            </div>
+            <div class="crew-member">
+              <div class="crew-add">+</div>
+              <span class="crew-name">הוסף</span>
+            </div>
+          </div>
+        </div>
+        <div class="caption">מצב עריכה — לחץ ✕ להסרה, לחץ שוב "ערוך" לסיום</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>לחיצה ארוכה</h3>
+      <p>לחיצה ארוכה על שחקן מציגה אפשרות להסיר. הוספה — תמיד דרך כפתור "+"</p>
+      <div class="col" style="margin-top:10px;">
+        <div class="phone-frame">
+          <div class="section-label">החבר׳ה הקבועים</div>
+          <div class="crew-row">
+            <div class="crew-member" style="position:relative;">
+              <div class="tooltip">הסר?</div>
+              <div class="crew-avatar long-press-ring" style="background:linear-gradient(135deg,#e74c3c,#c0392b)">🤙</div>
+              <span class="crew-name">דני</span>
+            </div>
+            <div class="crew-member">
+              <div class="crew-avatar" style="background:linear-gradient(135deg,#3498db,#2980b9)">😎</div>
+              <span class="crew-name">יוסי</span>
+            </div>
+            <div class="crew-member">
+              <div class="crew-avatar" style="background:linear-gradient(135deg,#2ecc71,#27ae60)">🦈</div>
+              <span class="crew-name">רון</span>
+            </div>
+            <div class="crew-member">
+              <div class="crew-add">+</div>
+              <span class="crew-name">הוסף</span>
+            </div>
+          </div>
+        </div>
+        <div class="caption">לחיצה ארוכה → tooltip הסרה מופיע</div>
+      </div>
+    </div>
+  </div>
+
+</div>
