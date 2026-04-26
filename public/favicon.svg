@@ -2,69 +2,24 @@
 
   <!-- Full-bleed background -->
   <rect width="512" height="512" fill="#1A1614"/>
-  <!-- Subtle center glow for depth -->
-  <radialGradient id="bg-glow" cx="50%" cy="48%" r="45%">
-    <stop offset="0%" stop-color="#2E2820"/>
-    <stop offset="100%" stop-color="#1A1614"/>
-  </radialGradient>
-  <rect width="512" height="512" fill="url(#bg-glow)"/>
 
-  <!-- ─── Back card — rotated -12° around canvas centre ─── -->
-  <g transform="rotate(-12, 256, 256)">
-    <rect x="134" y="99" width="248" height="347" rx="20" fill="#2E2820" stroke="rgba(200,190,168,0.18)" stroke-width="3"/>
-    <rect x="148" y="113" width="220" height="319" rx="14" fill="#272118"/>
-    <line x1="148" y1="166" x2="368" y2="166" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
-    <line x1="148" y1="219" x2="368" y2="219" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
-    <line x1="148" y1="272" x2="368" y2="272" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
-    <line x1="148" y1="325" x2="368" y2="325" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
-    <line x1="148" y1="378" x2="368" y2="378" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
-  </g>
+  <!-- Sage ring -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#4A7A5A" stroke-width="28"/>
 
-  <!-- ─── Front card — cream face, rotated +8° around canvas centre ─── -->
-  <g transform="rotate(8, 256, 256)">
-    <!-- Drop shadow -->
-    <rect x="182" y="79" width="260" height="364" rx="20" fill="rgba(0,0,0,0.35)"/>
-    <!-- Card face — cream/paper colour for contrast -->
-    <rect x="174" y="71" width="260" height="364" rx="20" fill="#C8BEA8"/>
-    <!-- Inset border -->
-    <rect x="186" y="83" width="236" height="340" rx="14" fill="none" stroke="rgba(26,22,20,0.10)" stroke-width="1.5"/>
-    <!-- Sage accent stripe at top -->
-    <rect x="174" y="71" width="260" height="12" rx="6" fill="#4A7A5A"/>
-    <!-- Gold accent stripe at bottom -->
-    <rect x="174" y="423" width="260" height="12" rx="6" fill="#C49A2C"/>
+  <!-- Inner dark fill -->
+  <circle cx="256" cy="256" r="206" fill="#1A1614"/>
 
-    <!--
-      Spade — pure path, centred in the cream card face.
-      Card content centre: x = 174+130 = 304, y = 71+182 = 253.
-      Spade bounding box: ~160×148, top at y≈173, base at y≈337.
-    -->
-    <path d="
-      M 304,173
-      C 268,190 228,220 228,252
-      C 228,276 246,290 268,284
-      C 256,308 240,322 220,328
-      L 388,328
-      C 368,322 352,308 340,284
-      C 362,290 380,276 380,252
-      C 380,220 340,190 304,173
-      Z
-    " fill="#1A1614"/>
-
-    <!-- ── Corner label top-left: "A" + spade dot ── -->
-    <!-- "A" as stroke paths — no font dependency -->
-    <line x1="195" y1="180" x2="207" y2="148" stroke="#1A1614" stroke-width="5.5" stroke-linecap="round"/>
-    <line x1="207" y1="148" x2="219" y2="180" stroke="#1A1614" stroke-width="5.5" stroke-linecap="round"/>
-    <line x1="198" y1="170" x2="216" y2="170" stroke="#1A1614" stroke-width="4"   stroke-linecap="round"/>
-    <!-- Mini spade dot -->
-    <circle cx="207" cy="192" r="5" fill="#1A1614"/>
-
-    <!-- ── Corner label bottom-right: rotated 180° around card centre (304, 253) ── -->
-    <g transform="rotate(180, 304, 253)">
-      <line x1="195" y1="180" x2="207" y2="148" stroke="#1A1614" stroke-width="5.5" stroke-linecap="round"/>
-      <line x1="207" y1="148" x2="219" y2="180" stroke="#1A1614" stroke-width="5.5" stroke-linecap="round"/>
-      <line x1="198" y1="170" x2="216" y2="170" stroke="#1A1614" stroke-width="4"   stroke-linecap="round"/>
-      <circle cx="207" cy="192" r="5" fill="#1A1614"/>
-    </g>
-  </g>
+  <!-- Spade — centred at (256, 256), ~226px tall × 216px wide -->
+  <path d="
+    M 256,143
+    C 210,168 156,209 156,263
+    C 156,303 180,321 210,313
+    C 194,345 174,361 148,369
+    L 364,369
+    C 338,361 318,345 302,313
+    C 332,321 356,303 356,263
+    C 356,209 302,168 256,143
+    Z
+  " fill="#C8BEA8"/>
 
 </svg>
