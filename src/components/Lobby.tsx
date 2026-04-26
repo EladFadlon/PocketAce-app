@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { storage } from '../utils/storage';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { User, GameRecord } from '../types';
 import { getRecentGames, calculateCumulativeProfitLoss, getCumulativeStatus } from '../utils/gameHistory';
@@ -27,31 +28,21 @@ export const Lobby: React.FC<LobbyProps> = ({ onStartGame, user, isPremium, onPr
   ];
   const CREW_EMOJIS = ['🤙', '😎', '🦈', '🤑', '😈', '🃏'];
 
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [recentGames, setRecentGames] = useState<GameRecord[]>([]);
+  const [showWelcome, setShowWelcome] = useState(() => {
+    const isNew = !storage.getVisited();
+    if (isNew) storage.setVisited();
+    return isNew;
+  });
+  const [recentGames] = useState<GameRecord[]>(() => getRecentGames(user.id, 3));
   const [selectedGame, setSelectedGame] = useState<GameRecord | null>(null);
-  const [status, setStatus] = useState({ badge: '', message: '' });
-  const [cumulative, setCumulative] = useState(0);
+  const [cumulative] = useState(() => calculateCumulativeProfitLoss(user.id, user.name));
+  const [status] = useState(() => getCumulativeStatus(calculateCumulativeProfitLoss(user.id, user.name), user.name.split(' ')[0]));
   const [regulars, setRegulars] = useState<string[]>(() => getRegulars());
   const [selectedRegulars, setSelectedRegulars] = useState<Set<string>>(new Set());
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [newRegularName, setNewRegularName] = useState('');
   const [pendingRemove, setPendingRemove] = useState<string | null>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    const hasVisited = localStorage.getItem('pocketAceVisited');
-    if (!hasVisited) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setShowWelcome(true);
-      localStorage.setItem('pocketAceVisited', 'true');
-    }
-    const games = getRecentGames(user.id, 3);
-    setRecentGames(games);
-    const cumulativeValue = calculateCumulativeProfitLoss(user.id, user.name);
-    setCumulative(cumulativeValue);
-    setStatus(getCumulativeStatus(cumulativeValue, user.name.split(' ')[0]));
-  }, [user.id, user.name]);
 
   useEffect(() => {
     return () => {

@@ -7,15 +7,7 @@ import { getWinnerInsult } from '../utils/winnerInsults';
 import { getRegulars, addRegular } from '../utils/regulars';
 import '../styles/results.css';
 
-const PLAYER_COLORS = [
-  { bg: 'linear-gradient(135deg,#e74c3c,#c0392b)' },
-  { bg: 'linear-gradient(135deg,#3498db,#2980b9)' },
-  { bg: 'linear-gradient(135deg,#2ecc71,#27ae60)' },
-  { bg: 'linear-gradient(135deg,#9b59b6,#8e44ad)' },
-  { bg: 'linear-gradient(135deg,#ff6b35,#e55a24)' },
-  { bg: 'linear-gradient(135deg,#f39c12,#d68910)' },
-];
-const PLAYER_EMOJIS = ['🤙', '😎', '🦈', '🤑', '😈', '🃏'];
+import { PLAYER_PALETTES, PLAYER_EMOJIS } from '../utils/playerColors';
 
 interface SettlementResultsProps {
   settlements: PlayerSettlement[];
@@ -40,7 +32,7 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
 
   const sortedSettlements = [...settlements].sort((a, b) => b.profitLossAfterFee - a.profitLossAfterFee);
   const colorMap = new Map(sortedSettlements.map((s, i) => [s.id, {
-    color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+    color: PLAYER_PALETTES[i % PLAYER_PALETTES.length],
     emoji: PLAYER_EMOJIS[i % PLAYER_EMOJIS.length],
   }]));
 
@@ -181,8 +173,8 @@ export const SettlementResults: React.FC<SettlementResultsProps> = ({
           <div className="results-debts">
             <div className="results-section-label results-debts-label">מי משלם למי 💸</div>
             {debts.map((debt, i) => {
-              const from = colorMap.get(debt.from.id) ?? { color: PLAYER_COLORS[0], emoji: PLAYER_EMOJIS[0] };
-              const to   = colorMap.get(debt.to.id)   ?? { color: PLAYER_COLORS[1], emoji: PLAYER_EMOJIS[1] };
+              const from = colorMap.get(debt.from.id) ?? { color: PLAYER_PALETTES[0], emoji: PLAYER_EMOJIS[0] };
+              const to   = colorMap.get(debt.to.id)   ?? { color: PLAYER_PALETTES[1], emoji: PLAYER_EMOJIS[1] };
               return (
                 <div
                   className="results-debt-card"

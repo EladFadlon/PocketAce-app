@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-
-const PLAYER_COLORS = [
-  { bg: 'linear-gradient(135deg,#e74c3c,#c0392b)', cardBg: 'linear-gradient(145deg,rgba(231,76,60,0.15),rgba(231,76,60,0.05))', border: 'rgba(231,76,60,0.35)', glow: 'rgba(231,76,60,0.45)', text: '#e74c3c' },
-  { bg: 'linear-gradient(135deg,#3498db,#2980b9)', cardBg: 'linear-gradient(145deg,rgba(52,152,219,0.15),rgba(52,152,219,0.05))',  border: 'rgba(52,152,219,0.35)',  glow: 'rgba(52,152,219,0.45)',  text: '#3498db' },
-  { bg: 'linear-gradient(135deg,#2ecc71,#27ae60)', cardBg: 'linear-gradient(145deg,rgba(46,204,113,0.15),rgba(46,204,113,0.05))',  border: 'rgba(46,204,113,0.35)',  glow: 'rgba(46,204,113,0.45)',  text: '#2ecc71' },
-  { bg: 'linear-gradient(135deg,#9b59b6,#8e44ad)', cardBg: 'linear-gradient(145deg,rgba(155,89,182,0.15),rgba(155,89,182,0.05))',  border: 'rgba(155,89,182,0.35)',  glow: 'rgba(155,89,182,0.45)',  text: '#9b59b6' },
-  { bg: 'linear-gradient(135deg,#ff6b35,#e55a24)', cardBg: 'linear-gradient(145deg,rgba(255,107,53,0.15),rgba(255,107,53,0.05))',  border: 'rgba(255,107,53,0.35)',  glow: 'rgba(255,107,53,0.45)',  text: '#ff6b35' },
-  { bg: 'linear-gradient(135deg,#f39c12,#d68910)', cardBg: 'linear-gradient(145deg,rgba(243,156,18,0.15),rgba(243,156,18,0.05))',  border: 'rgba(243,156,18,0.35)',  glow: 'rgba(243,156,18,0.45)',  text: '#f39c12' },
-];
-const PLAYER_EMOJIS = ['🤙', '😎', '🦈', '🤑', '😈', '🃏'];
 import type { Player, GameSettings } from '../types';
+import { getPlayerPalette, getPlayerEmoji } from '../utils/playerColors';
 import '../styles/endgame.css';
 
 interface EndGameProps {
@@ -18,15 +9,9 @@ interface EndGameProps {
   settings: GameSettings;
   onCalculate: (finalChips: Record<string, number>) => void;
   onBack: () => void;
-  onHome: () => void;
 }
 
-export const EndGame: React.FC<EndGameProps> = ({
-  players,
-  settings,
-  onCalculate,
-  onBack,
-}) => {
+export const EndGame: React.FC<EndGameProps> = ({ players, settings, onCalculate, onBack }) => {
   const [finalChips, setFinalChips] = useState<Record<string, number>>(
     players.reduce((acc, p) => ({ ...acc, [p.id]: p.buyIns * settings.chipsPerBuyIn }), {})
   );
@@ -38,10 +23,6 @@ export const EndGame: React.FC<EndGameProps> = ({
     const clamped = Math.max(0, value);
     setFinalChips({ ...finalChips, [playerId]: clamped });
     setRawChips({ ...rawChips, [playerId]: String(clamped) });
-  };
-
-  const handleCalculate = () => {
-    onCalculate(finalChips);
   };
 
   const totalZhetons = players.reduce((sum, p) => sum + (p.buyIns * settings.chipsPerBuyIn), 0);
@@ -62,19 +43,19 @@ export const EndGame: React.FC<EndGameProps> = ({
 
       <div className="endgame-body">
         {players.map((player, index) => {
-          const color = PLAYER_COLORS[index % PLAYER_COLORS.length];
-          const emoji = PLAYER_EMOJIS[index % PLAYER_EMOJIS.length];
+          const palette = getPlayerPalette(index);
+          const emoji = getPlayerEmoji(index);
           const value = finalChips[player.id] ?? 0;
 
           return (
             <div
               key={player.id}
               className="endgame-player-row"
-              style={{ background: color.cardBg, border: `1px solid ${color.border}` }}
+              style={{ background: palette.cardBg, border: `1px solid ${palette.border}` }}
             >
               <div
                 className="endgame-player-avatar"
-                style={{ background: color.bg, boxShadow: `0 4px 12px ${color.glow}` }}
+                style={{ background: palette.bg, boxShadow: `0 4px 12px ${palette.glow}` }}
               >{emoji}</div>
               <div className="endgame-player-info">
                 <div className="endgame-player-name">{player.name}</div>
@@ -82,11 +63,11 @@ export const EndGame: React.FC<EndGameProps> = ({
               </div>
               <div
                 className="endgame-stepper"
-                style={{ border: `1px solid ${color.border}` }}
+                style={{ border: `1px solid ${palette.border}` }}
               >
                 <button
                   className="endgame-stepper-btn"
-                  style={{ color: `${color.text}60` }}
+                  style={{ color: `${palette.text}60` }}
                   onClick={() => handleChipChange(player.id, Math.max(0, value - settings.chipsPerBuyIn))}
                 >−</button>
                 <input
@@ -107,7 +88,7 @@ export const EndGame: React.FC<EndGameProps> = ({
                 />
                 <button
                   className="endgame-stepper-btn"
-                  style={{ color: color.text }}
+                  style={{ color: palette.text }}
                   onClick={() => handleChipChange(player.id, value + settings.chipsPerBuyIn)}
                 >+</button>
               </div>
@@ -126,7 +107,7 @@ export const EndGame: React.FC<EndGameProps> = ({
       <div className="endgame-footer">
         <motion.button
           className="endgame-cta"
-          onClick={handleCalculate}
+          onClick={() => onCalculate(finalChips)}
           disabled={!isValid}
           whileTap={{ scale: 0.97 }}
         >חשב מי חייב למי 🧮</motion.button>
