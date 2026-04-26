@@ -1,69 +1,69 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- Full-bleed background — no transparency so iOS doesn't add white -->
+  <!-- Full-bleed background -->
   <rect width="512" height="512" fill="#1A1614"/>
+  <!-- Subtle center glow for depth -->
+  <radialGradient id="bg-glow" cx="50%" cy="48%" r="45%">
+    <stop offset="0%" stop-color="#2E2820"/>
+    <stop offset="100%" stop-color="#1A1614"/>
+  </radialGradient>
+  <rect width="512" height="512" fill="url(#bg-glow)"/>
 
-  <!-- ── Back card: rotated -12° around canvas centre (256,256) ── -->
+  <!-- ─── Back card — rotated -12° around canvas centre ─── -->
   <g transform="rotate(-12, 256, 256)">
-    <!-- Card body -->
-    <rect x="130" y="116" width="200" height="280" rx="18" fill="#272118" stroke="rgba(200,190,168,0.14)" stroke-width="3"/>
-    <!-- Inner face -->
-    <rect x="142" y="128" width="176" height="256" rx="12" fill="#2E2820"/>
-    <!-- Subtle horizontal lines (card-back texture) -->
-    <line x1="142" y1="175" x2="318" y2="175" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
-    <line x1="142" y1="222" x2="318" y2="222" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
-    <line x1="142" y1="269" x2="318" y2="269" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
-    <line x1="142" y1="316" x2="318" y2="316" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
-    <line x1="142" y1="363" x2="318" y2="363" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
+    <rect x="134" y="99" width="248" height="347" rx="20" fill="#2E2820" stroke="rgba(200,190,168,0.18)" stroke-width="3"/>
+    <rect x="148" y="113" width="220" height="319" rx="14" fill="#272118"/>
+    <line x1="148" y1="166" x2="368" y2="166" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
+    <line x1="148" y1="219" x2="368" y2="219" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
+    <line x1="148" y1="272" x2="368" y2="272" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
+    <line x1="148" y1="325" x2="368" y2="325" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
+    <line x1="148" y1="378" x2="368" y2="378" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
   </g>
 
-  <!-- ── Front card: rotated +8° around canvas centre (256,256) ── -->
+  <!-- ─── Front card — cream face, rotated +8° around canvas centre ─── -->
   <g transform="rotate(8, 256, 256)">
-    <!-- Card body -->
-    <rect x="168" y="110" width="200" height="280" rx="18" fill="#201C18" stroke="rgba(200,190,168,0.22)" stroke-width="3"/>
+    <!-- Drop shadow -->
+    <rect x="182" y="79" width="260" height="364" rx="20" fill="rgba(0,0,0,0.35)"/>
+    <!-- Card face — cream/paper colour for contrast -->
+    <rect x="174" y="71" width="260" height="364" rx="20" fill="#C8BEA8"/>
+    <!-- Inset border -->
+    <rect x="186" y="83" width="236" height="340" rx="14" fill="none" stroke="rgba(26,22,20,0.10)" stroke-width="1.5"/>
     <!-- Sage accent stripe at top -->
-    <rect x="168" y="110" width="200" height="10" rx="5" fill="#4A7A5A"/>
+    <rect x="174" y="71" width="260" height="12" rx="6" fill="#4A7A5A"/>
+    <!-- Gold accent stripe at bottom -->
+    <rect x="174" y="423" width="260" height="12" rx="6" fill="#C49A2C"/>
 
     <!--
-      Spade symbol — pure path, no text/font dependency.
-      Centred at (268, 248) inside the front card.
-      Anatomy: two upper lobes meeting at top point, lower stem with flat base.
+      Spade — pure path, centred in the cream card face.
+      Card content centre: x = 174+130 = 304, y = 71+182 = 253.
+      Spade bounding box: ~160×148, top at y≈173, base at y≈337.
     -->
-    <!-- Upper lobes -->
-    <path
-      d="
-        M 268,182
-        C 238,196 204,222 204,250
-        C 204,272 220,284 242,278
-        C 232,298 218,310 200,316
-        L 336,316
-        C 318,310 304,298 294,278
-        C 316,284 332,272 332,250
-        C 332,222 298,196 268,182
-        Z
-      "
-      fill="#C8BEA8"
-    />
+    <path d="
+      M 304,173
+      C 268,190 228,220 228,252
+      C 228,276 246,290 268,284
+      C 256,308 240,322 220,328
+      L 388,328
+      C 368,322 352,308 340,284
+      C 362,290 380,276 380,252
+      C 380,220 340,190 304,173
+      Z
+    " fill="#1A1614"/>
 
-    <!-- Corner label — top left: small "A" + spade dot -->
-    <!-- "A" drawn as stroked paths (no font) -->
-    <g opacity="0.75">
-      <!-- Left leg of A -->
-      <line x1="187" y1="168" x2="196" y2="144" stroke="#C8BEA8" stroke-width="4" stroke-linecap="round"/>
-      <!-- Right leg of A -->
-      <line x1="196" y1="144" x2="205" y2="168" stroke="#C8BEA8" stroke-width="4" stroke-linecap="round"/>
-      <!-- Crossbar of A -->
-      <line x1="189" y1="159" x2="203" y2="159" stroke="#C8BEA8" stroke-width="3" stroke-linecap="round"/>
-      <!-- Mini spade dot below A -->
-      <circle cx="196" cy="176" r="3" fill="#C8BEA8"/>
-    </g>
+    <!-- ── Corner label top-left: "A" + spade dot ── -->
+    <!-- "A" as stroke paths — no font dependency -->
+    <line x1="195" y1="180" x2="207" y2="148" stroke="#1A1614" stroke-width="5.5" stroke-linecap="round"/>
+    <line x1="207" y1="148" x2="219" y2="180" stroke="#1A1614" stroke-width="5.5" stroke-linecap="round"/>
+    <line x1="198" y1="170" x2="216" y2="170" stroke="#1A1614" stroke-width="4"   stroke-linecap="round"/>
+    <!-- Mini spade dot -->
+    <circle cx="207" cy="192" r="5" fill="#1A1614"/>
 
-    <!-- Corner label — bottom right (rotated 180° around card centre 268,250) -->
-    <g transform="rotate(180, 268, 250)" opacity="0.75">
-      <line x1="187" y1="168" x2="196" y2="144" stroke="#C8BEA8" stroke-width="4" stroke-linecap="round"/>
-      <line x1="196" y1="144" x2="205" y2="168" stroke="#C8BEA8" stroke-width="4" stroke-linecap="round"/>
-      <line x1="189" y1="159" x2="203" y2="159" stroke="#C8BEA8" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="196" cy="176" r="3" fill="#C8BEA8"/>
+    <!-- ── Corner label bottom-right: rotated 180° around card centre (304, 253) ── -->
+    <g transform="rotate(180, 304, 253)">
+      <line x1="195" y1="180" x2="207" y2="148" stroke="#1A1614" stroke-width="5.5" stroke-linecap="round"/>
+      <line x1="207" y1="148" x2="219" y2="180" stroke="#1A1614" stroke-width="5.5" stroke-linecap="round"/>
+      <line x1="198" y1="170" x2="216" y2="170" stroke="#1A1614" stroke-width="4"   stroke-linecap="round"/>
+      <circle cx="207" cy="192" r="5" fill="#1A1614"/>
     </g>
   </g>
 
