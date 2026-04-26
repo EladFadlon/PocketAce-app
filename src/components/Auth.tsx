@@ -50,10 +50,31 @@ export const Auth: React.FC<AuthProps> = ({ onAuth }) => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="auth-logo-wrap">
-            <div className="auth-logo-text">
-              Pocket<br />
-              <span className="auth-logo-ace">Ace</span>
-            </div>
+            <svg className="auth-logo-svg" width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Back card */}
+              <g transform="rotate(-12, 60, 70)">
+                <rect x="18" y="22" width="60" height="80" rx="8" fill="#272118" stroke="rgba(200,190,168,0.15)" strokeWidth="1.5"/>
+                <rect x="22" y="26" width="52" height="72" rx="6" fill="#2E2820"/>
+                <line x1="22" y1="38" x2="74" y2="38" stroke="rgba(200,190,168,0.06)" strokeWidth="1"/>
+                <line x1="22" y1="50" x2="74" y2="50" stroke="rgba(200,190,168,0.06)" strokeWidth="1"/>
+                <line x1="22" y1="62" x2="74" y2="62" stroke="rgba(200,190,168,0.06)" strokeWidth="1"/>
+                <line x1="22" y1="74" x2="74" y2="74" stroke="rgba(200,190,168,0.06)" strokeWidth="1"/>
+                <line x1="22" y1="86" x2="74" y2="86" stroke="rgba(200,190,168,0.06)" strokeWidth="1"/>
+              </g>
+              {/* Front card — ace of spades */}
+              <g transform="rotate(8, 60, 70)">
+                <rect x="30" y="18" width="62" height="84" rx="8" fill="#201C18" stroke="rgba(200,190,168,0.2)" strokeWidth="1.5"/>
+                <text x="37" y="35" fontFamily="serif" fontSize="13" fontWeight="700" fill="#C8BEA8" textAnchor="middle">A</text>
+                <text x="37" y="45" fontFamily="serif" fontSize="9" fill="#C8BEA8" textAnchor="middle">♠</text>
+                <text x="61" y="72" fontFamily="serif" fontSize="36" fill="#C8BEA8" textAnchor="middle">♠</text>
+                <g transform="rotate(180, 84, 87)">
+                  <text x="84" y="80" fontFamily="serif" fontSize="13" fontWeight="700" fill="#C8BEA8" textAnchor="middle">A</text>
+                  <text x="84" y="90" fontFamily="serif" fontSize="9" fill="#C8BEA8" textAnchor="middle">♠</text>
+                </g>
+                <rect x="30" y="18" width="62" height="3" rx="2" fill="#4A7A5A"/>
+              </g>
+            </svg>
+            <div className="auth-logo-name">PocketAce</div>
             <div className="auth-logo-sub">ניהול שולחן פוקר</div>
           </div>
 
