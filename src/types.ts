@@ -60,3 +60,10 @@ export interface GameState {
   settlements?: PlayerSettlement[];
   debts?: Debt[];
 }
+
+export interface SavedGame {
+  phase: GamePhase;
+  players: Player[];
+  settings: GameSettings;
+  gameStartedAt: number | null;
+}
