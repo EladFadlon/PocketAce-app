@@ -1,30 +1,17 @@
 import type { GameRecord, PlayerSettlement, Debt } from '../types';
+import { storage } from './storage';
 
-const GAME_HISTORY_KEY = 'pocketAce_gameHistory';
-
-/**
- * Get game history for current user
- */
-export const getGameHistory = (userId: string): GameRecord[] => {
-  try {
-    const stored = localStorage.getItem(`${GAME_HISTORY_KEY}_${userId}`);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-};
-
-/**
- * Save game record to user's history
- */
 const MAX_HISTORY = 100;
+
+export const getGameHistory = (userId: string): GameRecord[] =>
+  storage.getGameHistory(userId);
 
 export const saveGameRecord = (
   userId: string,
   hostsName: string,
   settlements: PlayerSettlement[],
   debts: Debt[]
-) => {
+): GameRecord => {
   const history = getGameHistory(userId);
 
   const topShark = settlements
@@ -41,57 +28,36 @@ export const saveGameRecord = (
     totalPot,
     topShark: topShark ? {
       name: topShark.name,
-      amount: parseFloat(topShark.profitLossAfterFee.toFixed(2))
+      amount: parseFloat(topShark.profitLossAfterFee.toFixed(2)),
     } : null,
-    debts: debts.map(d => ({
-      from: d.from.name,
-      to: d.to.name,
-      amount: d.amount
-    })),
+    debts: debts.map(d => ({ from: d.from.name, to: d.to.name, amount: d.amount })),
     playerResults: settlements.map(s => ({
       name: s.name,
-      profitLossAfterFee: parseFloat(s.profitLossAfterFee.toFixed(2))
-    }))
+      profitLossAfterFee: parseFloat(s.profitLossAfterFee.toFixed(2)),
+    })),
   };
 
   history.unshift(record);
-  localStorage.setItem(`${GAME_HISTORY_KEY}_${userId}`, JSON.stringify(history.slice(0, MAX_HISTORY)));
+  storage.setGameHistory(userId, history.slice(0, MAX_HISTORY));
 
   return record;
 };
 
-/**
- * Get recent games (last N games)
- */
-export const getRecentGames = (userId: string, limit: number = 5): GameRecord[] => {
-  return getGameHistory(userId).slice(0, limit);
-};
+export const getRecentGames = (userId: string, limit = 5): GameRecord[] =>
+  getGameHistory(userId).slice(0, limit);
 
-/**
- * Clear game history
- */
-export const clearGameHistory = (userId: string) => {
-  localStorage.removeItem(`${GAME_HISTORY_KEY}_${userId}`);
-};
+export const clearGameHistory = (userId: string): void =>
+  storage.clearGameHistory(userId);
 
-/**
- * Calculate cumulative profit/loss for a user across all games (in red or green)
- */
 export const calculateCumulativeProfitLoss = (userId: string, userName: string): number => {
   const history = getGameHistory(userId);
-
   return history.reduce((cumulative, game) => {
     if (!game.playerResults) return cumulative;
-
-    // For records that store hostUserId, match the host's result by their stored name.
-    // Fall back to name-matching for older records without hostUserId.
     const hostName = game.hostUserId === userId ? game.hostsName : null;
     const userResult = game.playerResults.find(p =>
       hostName ? p.name === hostName : p.name === userName
     );
-    if (!userResult) return cumulative;
-
-    return cumulative + userResult.profitLossAfterFee;
+    return userResult ? cumulative + userResult.profitLossAfterFee : cumulative;
   }, 0);
 };
 

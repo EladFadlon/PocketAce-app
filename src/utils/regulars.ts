@@ -1,20 +1,16 @@
-const KEY = 'pocketAce_regulars';
+import { storage } from './storage';
 
 export function getRegulars(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) || '[]');
-  } catch {
-    return [];
-  }
+  return storage.getRegulars();
 }
 
 export function addRegular(name: string): void {
-  const current = getRegulars();
+  const current = storage.getRegulars();
   if (!current.includes(name)) {
-    localStorage.setItem(KEY, JSON.stringify([...current, name]));
+    storage.setRegulars([...current, name]);
   }
 }
 
 export function removeRegular(name: string): void {
-  localStorage.setItem(KEY, JSON.stringify(getRegulars().filter(n => n !== name)));
+  storage.setRegulars(storage.getRegulars().filter(n => n !== name));
 }
