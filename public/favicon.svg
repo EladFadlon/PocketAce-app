@@ -1,32 +1,32 @@
-<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- App icon background -->
-  <rect width="120" height="120" rx="24" fill="#1A1614"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Full-bleed background — no rounded corners so iOS doesn't show white edges -->
+  <rect width="512" height="512" fill="#1A1614"/>
 
-  <!-- Back card — rotated left -->
-  <g transform="rotate(-12, 60, 70)">
-    <rect x="18" y="22" width="60" height="80" rx="8" fill="#272118" stroke="rgba(200,190,168,0.15)" stroke-width="1.5"/>
-    <rect x="22" y="26" width="52" height="72" rx="6" fill="#2E2820"/>
-    <line x1="22" y1="38" x2="74" y2="38" stroke="rgba(200,190,168,0.06)" stroke-width="1"/>
-    <line x1="22" y1="50" x2="74" y2="50" stroke="rgba(200,190,168,0.06)" stroke-width="1"/>
-    <line x1="22" y1="62" x2="74" y2="62" stroke="rgba(200,190,168,0.06)" stroke-width="1"/>
-    <line x1="22" y1="74" x2="74" y2="74" stroke="rgba(200,190,168,0.06)" stroke-width="1"/>
-    <line x1="22" y1="86" x2="74" y2="86" stroke="rgba(200,190,168,0.06)" stroke-width="1"/>
+  <!-- Back card — rotated left, centred in safe zone -->
+  <g transform="rotate(-12, 256, 300)">
+    <rect x="76" y="94" width="256" height="340" rx="32" fill="#272118" stroke="rgba(200,190,168,0.15)" stroke-width="6"/>
+    <rect x="94" y="112" width="220" height="306" rx="24" fill="#2E2820"/>
+    <line x1="94" y1="163" x2="314" y2="163" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
+    <line x1="94" y1="214" x2="314" y2="214" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
+    <line x1="94" y1="265" x2="314" y2="265" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
+    <line x1="94" y1="316" x2="314" y2="316" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
+    <line x1="94" y1="367" x2="314" y2="367" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
   </g>
 
   <!-- Front card — ace of spades — rotated right -->
-  <g transform="rotate(8, 60, 70)">
-    <rect x="30" y="18" width="62" height="84" rx="8" fill="#201C18" stroke="rgba(200,190,168,0.2)" stroke-width="1.5"/>
-    <!-- Top-left corner: A + spade -->
-    <text x="37" y="35" font-family="serif" font-size="13" font-weight="700" fill="#C8BEA8" text-anchor="middle">A</text>
-    <text x="37" y="45" font-family="serif" font-size="9" fill="#C8BEA8" text-anchor="middle">&#9824;</text>
+  <g transform="rotate(8, 256, 300)">
+    <rect x="128" y="78" width="264" height="356" rx="32" fill="#201C18" stroke="rgba(200,190,168,0.22)" stroke-width="6"/>
+    <!-- Sage accent stripe -->
+    <rect x="128" y="78" width="264" height="12" rx="6" fill="#4A7A5A"/>
+    <!-- Top-left corner label -->
+    <text x="158" y="148" font-family="Georgia,serif" font-size="56" font-weight="700" fill="#C8BEA8" text-anchor="middle">A</text>
+    <text x="158" y="192" font-family="Georgia,serif" font-size="38" fill="#C8BEA8" text-anchor="middle">&#9824;</text>
     <!-- Centre big spade -->
-    <text x="61" y="72" font-family="serif" font-size="36" fill="#C8BEA8" text-anchor="middle">&#9824;</text>
-    <!-- Bottom-right corner: A + spade (180° rotated) -->
-    <g transform="rotate(180, 84, 87)">
-      <text x="84" y="80" font-family="serif" font-size="13" font-weight="700" fill="#C8BEA8" text-anchor="middle">A</text>
-      <text x="84" y="90" font-family="serif" font-size="9" fill="#C8BEA8" text-anchor="middle">&#9824;</text>
+    <text x="260" y="318" font-family="Georgia,serif" font-size="152" fill="#C8BEA8" text-anchor="middle">&#9824;</text>
+    <!-- Bottom-right corner label (rotated 180°) -->
+    <g transform="rotate(180, 358, 370)">
+      <text x="358" y="342" font-family="Georgia,serif" font-size="56" font-weight="700" fill="#C8BEA8" text-anchor="middle">A</text>
+      <text x="358" y="386" font-family="Georgia,serif" font-size="38" fill="#C8BEA8" text-anchor="middle">&#9824;</text>
     </g>
-    <!-- Sage accent stripe at top of card -->
-    <rect x="30" y="18" width="62" height="3" rx="2" fill="#4A7A5A"/>
   </g>
 </svg>
