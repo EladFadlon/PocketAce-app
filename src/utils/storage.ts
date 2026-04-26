@@ -1,12 +1,13 @@
 import type { User, GameRecord, SavedGame } from '../types';
 
 const KEYS = {
-  USER:         'pocketAce_user',
-  CURRENT_GAME: 'pocketAce_currentGame',
-  REGULARS:     'pocketAce_regulars',
-  IS_PREMIUM:   'pocketAce_isPremium',
-  VISITED:      'pocketAceVisited',
-  gameHistory:  (userId: string) => `pocketAce_gameHistory_${userId}`,
+  USER:              'pocketAce_user',
+  CURRENT_GAME:      'pocketAce_currentGame',
+  REGULARS:          'pocketAce_regulars',
+  IS_PREMIUM:        'pocketAce_isPremium',
+  VISITED:           'pocketAceVisited',
+  INSTALL_DISMISSED: 'pocketAce_installDismissed',
+  gameHistory:       (userId: string) => `pocketAce_gameHistory_${userId}`,
 } as const;
 
 const parse = <T>(key: string, fallback: T): T => {
@@ -47,6 +48,10 @@ export const storage = {
   // ── First-visit flag ───────────────────────────────────
   getVisited(): boolean { return localStorage.getItem(KEYS.VISITED) === 'true'; },
   setVisited(): void    { localStorage.setItem(KEYS.VISITED, 'true'); },
+
+  // ── PWA install dismissed ──────────────────────────────
+  getInstallDismissed(): boolean { return !!localStorage.getItem(KEYS.INSTALL_DISMISSED); },
+  setInstallDismissed(): void    { localStorage.setItem(KEYS.INSTALL_DISMISSED, '1'); },
 
   // ── Game history (per user) ────────────────────────────
   getGameHistory(userId: string):                  GameRecord[] { return parse<GameRecord[]>(KEYS.gameHistory(userId), []); },
