@@ -9,57 +9,55 @@ import { EndGame } from './components/EndGame';
 import { SettlementResults } from './components/SettlementResults';
 import { InstallPrompt } from './components/InstallPrompt';
 import { calculatePlayerSettlements, minimizeDebts } from './utils/settlements';
-import { getStoredUser } from './utils/auth';
 import { saveGameRecord } from './utils/gameHistory';
+import { storage } from './utils/storage';
 import './App.css';
 
-const GAME_SAVE_KEY = 'pocketAce_currentGame';
+const DEFAULT_SETTINGS: GameSettings = { nisPerBuyIn: 50, chipsPerBuyIn: 100 };
+
+interface InitialAppState {
+  user: User | null;
+  phase: GamePhase;
+  players: Player[];
+  settings: GameSettings;
+  gameStartedAt: number | null;
+}
+
+const getInitialAppState = (): InitialAppState => {
+  const user = storage.getUser();
+  if (!user) {
+    return { user: null, phase: GamePhaseEnum.AUTH, players: [], settings: DEFAULT_SETTINGS, gameStartedAt: null };
+  }
+  const saved = storage.getCurrentGame();
+  if (saved?.players?.length) {
+    return { user, phase: saved.phase, players: saved.players, settings: saved.settings, gameStartedAt: saved.gameStartedAt };
+  }
+  return { user, phase: GamePhaseEnum.LOBBY, players: [], settings: DEFAULT_SETTINGS, gameStartedAt: null };
+};
 
 function App() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [phase, setPhase] = useState<GamePhase>(GamePhaseEnum.AUTH);
-  const [settings, setSettings] = useState<GameSettings>({ nisPerBuyIn: 50, chipsPerBuyIn: 100 });
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [initial] = useState(getInitialAppState);
+  const [currentUser, setCurrentUser] = useState<User | null>(initial.user);
+  const [phase, setPhase] = useState<GamePhase>(initial.phase);
+  const [settings, setSettings] = useState<GameSettings>(initial.settings);
+  const [players, setPlayers] = useState<Player[]>(initial.players);
   const [settlements, setSettlements] = useState<PlayerSettlement[]>([]);
   const [debts, setDebts] = useState<Debt[]>([]);
-  // TODO: web monetization — set via onPremiumChange once a payment provider is wired in
-  const [isPremium, setIsPremium] = useState(() => localStorage.getItem('pocketAce_isPremium') === 'true');
-  const [gameStartedAt, setGameStartedAt] = useState<number | null>(null);
-
-  const handlePremiumChange = useCallback((value: boolean) => {
-    setIsPremium(value);
-    if (value) localStorage.setItem('pocketAce_isPremium', 'true');
-    else localStorage.removeItem('pocketAce_isPremium');
-  }, []);
-
-  useEffect(() => {
-    const user = getStoredUser();
-    if (!user) return; // stay on AUTH
-    setCurrentUser(user);
-    try {
-      const saved = localStorage.getItem(GAME_SAVE_KEY);
-      if (saved) {
-        const { phase: savedPhase, players: savedPlayers, settings: savedSettings, gameStartedAt: savedStartedAt } = JSON.parse(saved);
-        if (savedPlayers?.length > 0) {
-          setPlayers(savedPlayers);
-          setSettings(savedSettings);
-          setPhase(savedPhase);
-          setGameStartedAt(savedStartedAt ?? null);
-          return;
-        }
-      }
-    } catch { /* fall through */ }
-    setPhase(GamePhaseEnum.LOBBY);
-  }, []);
+  const [isPremium, setIsPremium] = useState<boolean>(storage.getIsPremium());
+  const [gameStartedAt, setGameStartedAt] = useState<number | null>(initial.gameStartedAt);
 
   useEffect(() => {
     if (phase === GamePhaseEnum.TABLE || phase === GamePhaseEnum.END_GAME) {
-      localStorage.setItem(GAME_SAVE_KEY, JSON.stringify({ phase, players, settings, gameStartedAt }));
+      storage.setCurrentGame({ phase, players, settings, gameStartedAt });
     } else if (([GamePhaseEnum.LOBBY, GamePhaseEnum.RESULTS, GamePhaseEnum.AUTH] as string[]).includes(phase)) {
-      localStorage.removeItem(GAME_SAVE_KEY);
+      storage.clearCurrentGame();
     }
-  }, [phase, players, settings]);
+  }, [phase, players, settings, gameStartedAt]);
 
+  const handlePremiumChange = useCallback((value: boolean) => {
+    setIsPremium(value);
+    storage.setIsPremium(value);
+  }, []);
 
   const handleAuth = useCallback((user: User) => {
     setCurrentUser(user);
@@ -134,7 +132,7 @@ function App() {
   }, []);
 
   const handleQuit = useCallback(() => {
-    localStorage.removeItem(GAME_SAVE_KEY);
+    storage.clearCurrentGame();
     setPhase(GamePhaseEnum.LOBBY);
     setPlayers([]);
   }, []);
@@ -173,7 +171,6 @@ function App() {
           settings={settings}
           onCalculate={handleCalculateSettlements}
           onBack={handleBackFromEndGame}
-          onHome={resetToLobby}
         />
       )}
 
