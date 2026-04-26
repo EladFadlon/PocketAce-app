@@ -1,32 +1,70 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Full-bleed background — no rounded corners so iOS doesn't show white edges -->
+
+  <!-- Full-bleed background — no transparency so iOS doesn't add white -->
   <rect width="512" height="512" fill="#1A1614"/>
 
-  <!-- Back card — rotated left, centred in safe zone -->
-  <g transform="rotate(-12, 256, 300)">
-    <rect x="76" y="94" width="256" height="340" rx="32" fill="#272118" stroke="rgba(200,190,168,0.15)" stroke-width="6"/>
-    <rect x="94" y="112" width="220" height="306" rx="24" fill="#2E2820"/>
-    <line x1="94" y1="163" x2="314" y2="163" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
-    <line x1="94" y1="214" x2="314" y2="214" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
-    <line x1="94" y1="265" x2="314" y2="265" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
-    <line x1="94" y1="316" x2="314" y2="316" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
-    <line x1="94" y1="367" x2="314" y2="367" stroke="rgba(200,190,168,0.06)" stroke-width="4"/>
+  <!-- ── Back card: rotated -12° around canvas centre (256,256) ── -->
+  <g transform="rotate(-12, 256, 256)">
+    <!-- Card body -->
+    <rect x="130" y="116" width="200" height="280" rx="18" fill="#272118" stroke="rgba(200,190,168,0.14)" stroke-width="3"/>
+    <!-- Inner face -->
+    <rect x="142" y="128" width="176" height="256" rx="12" fill="#2E2820"/>
+    <!-- Subtle horizontal lines (card-back texture) -->
+    <line x1="142" y1="175" x2="318" y2="175" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
+    <line x1="142" y1="222" x2="318" y2="222" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
+    <line x1="142" y1="269" x2="318" y2="269" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
+    <line x1="142" y1="316" x2="318" y2="316" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
+    <line x1="142" y1="363" x2="318" y2="363" stroke="rgba(200,190,168,0.05)" stroke-width="2"/>
   </g>
 
-  <!-- Front card — ace of spades — rotated right -->
-  <g transform="rotate(8, 256, 300)">
-    <rect x="128" y="78" width="264" height="356" rx="32" fill="#201C18" stroke="rgba(200,190,168,0.22)" stroke-width="6"/>
-    <!-- Sage accent stripe -->
-    <rect x="128" y="78" width="264" height="12" rx="6" fill="#4A7A5A"/>
-    <!-- Top-left corner label -->
-    <text x="158" y="148" font-family="Georgia,serif" font-size="56" font-weight="700" fill="#C8BEA8" text-anchor="middle">A</text>
-    <text x="158" y="192" font-family="Georgia,serif" font-size="38" fill="#C8BEA8" text-anchor="middle">&#9824;</text>
-    <!-- Centre big spade -->
-    <text x="260" y="318" font-family="Georgia,serif" font-size="152" fill="#C8BEA8" text-anchor="middle">&#9824;</text>
-    <!-- Bottom-right corner label (rotated 180°) -->
-    <g transform="rotate(180, 358, 370)">
-      <text x="358" y="342" font-family="Georgia,serif" font-size="56" font-weight="700" fill="#C8BEA8" text-anchor="middle">A</text>
-      <text x="358" y="386" font-family="Georgia,serif" font-size="38" fill="#C8BEA8" text-anchor="middle">&#9824;</text>
+  <!-- ── Front card: rotated +8° around canvas centre (256,256) ── -->
+  <g transform="rotate(8, 256, 256)">
+    <!-- Card body -->
+    <rect x="168" y="110" width="200" height="280" rx="18" fill="#201C18" stroke="rgba(200,190,168,0.22)" stroke-width="3"/>
+    <!-- Sage accent stripe at top -->
+    <rect x="168" y="110" width="200" height="10" rx="5" fill="#4A7A5A"/>
+
+    <!--
+      Spade symbol — pure path, no text/font dependency.
+      Centred at (268, 248) inside the front card.
+      Anatomy: two upper lobes meeting at top point, lower stem with flat base.
+    -->
+    <!-- Upper lobes -->
+    <path
+      d="
+        M 268,182
+        C 238,196 204,222 204,250
+        C 204,272 220,284 242,278
+        C 232,298 218,310 200,316
+        L 336,316
+        C 318,310 304,298 294,278
+        C 316,284 332,272 332,250
+        C 332,222 298,196 268,182
+        Z
+      "
+      fill="#C8BEA8"
+    />
+
+    <!-- Corner label — top left: small "A" + spade dot -->
+    <!-- "A" drawn as stroked paths (no font) -->
+    <g opacity="0.75">
+      <!-- Left leg of A -->
+      <line x1="187" y1="168" x2="196" y2="144" stroke="#C8BEA8" stroke-width="4" stroke-linecap="round"/>
+      <!-- Right leg of A -->
+      <line x1="196" y1="144" x2="205" y2="168" stroke="#C8BEA8" stroke-width="4" stroke-linecap="round"/>
+      <!-- Crossbar of A -->
+      <line x1="189" y1="159" x2="203" y2="159" stroke="#C8BEA8" stroke-width="3" stroke-linecap="round"/>
+      <!-- Mini spade dot below A -->
+      <circle cx="196" cy="176" r="3" fill="#C8BEA8"/>
+    </g>
+
+    <!-- Corner label — bottom right (rotated 180° around card centre 268,250) -->
+    <g transform="rotate(180, 268, 250)" opacity="0.75">
+      <line x1="187" y1="168" x2="196" y2="144" stroke="#C8BEA8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="196" y1="144" x2="205" y2="168" stroke="#C8BEA8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="189" y1="159" x2="203" y2="159" stroke="#C8BEA8" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="196" cy="176" r="3" fill="#C8BEA8"/>
     </g>
   </g>
+
 </svg>
