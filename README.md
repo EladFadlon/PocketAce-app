@@ -4,7 +4,7 @@
 
 At the end of a home game someone always ends up with a notebook and a calculator, working out who owes whom. Pocket Ace does that part. You set the table, tap "+ buy-in" during the game, enter final chip counts, and get a payment list ready to share in WhatsApp.
 
-Built with React 19 + TypeScript. Ships as a **PWA**, an **Android** app and an **iOS** app from a single codebase (Capacitor). Hebrew, right-to-left UI.
+Built with React 19 + TypeScript as an installable **Progressive Web App (PWA)** that runs in any browser, on desktop and on mobile. Hebrew, right-to-left UI.
 
 <!-- Add 2–3 screenshots here, e.g.:
 <p align="center">
@@ -26,7 +26,7 @@ Built with React 19 + TypeScript. Ships as a **PWA**, an **Android** app and an 
 - **Regulars:** save your usual crew and start a new game by tapping names.
 - **Game history and stats:** the last 100 games are stored per user, with cumulative profit/loss and a status badge.
 - **Crash-safe:** the in-progress game is saved continuously, so closing the app or refreshing mid-game loses nothing.
-- **Installable:** works offline as a PWA and as a native Android/iOS app.
+- **Installable:** add it to your phone's home screen and use it offline, like a native app.
 
 ## Tech Stack
 
@@ -35,7 +35,7 @@ Built with React 19 + TypeScript. Ships as a **PWA**, an **Android** app and an 
 | UI | React 19, TypeScript (strict mode) |
 | Build | Vite |
 | Animation | Framer Motion |
-| Mobile | Capacitor (Android and iOS), vite-plugin-pwa (service worker, offline support) |
+| PWA | vite-plugin-pwa (service worker, offline support, installable) |
 | Storage | Browser `localStorage`, no backend |
 | Hosting | Firebase Hosting |
 | Tooling | ESLint, typescript-eslint |
@@ -85,15 +85,6 @@ npm run dev        # http://localhost:5173
 | `npm run preview` | Serve the production build locally |
 | `npm run lint` | Run ESLint |
 
-### Running on Android / iOS
-
-```bash
-npm run build
-npx cap sync
-npx cap open android   # opens Android Studio
-npx cap open ios       # opens Xcode (macOS only)
-```
-
 ## Project Structure
 
 ```
@@ -113,7 +104,6 @@ src/
 │   ├── storage.ts       # localStorage access layer
 │   └── regulars.ts      # Saved player list
 └── styles/              # Per-component CSS and design tokens
-android/  ios/           # Capacitor native projects
 ```
 
 ## Roadmap

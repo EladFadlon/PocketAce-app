@@ -9,11 +9,6 @@ npm run dev      # Start Vite dev server with HMR
 npm run build    # TypeScript check + production build
 npm run lint     # ESLint across all files
 npm run preview  # Preview production build locally
-
-# Capacitor (native iOS/Android)
-npx cap sync     # Sync web build to native projects
-npx cap open ios     # Open Xcode
-npx cap open android # Open Android Studio
 ```
 
 No test suite exists in this project.
@@ -64,10 +59,7 @@ Each phase renders one full-screen component. There are no URLs or routes.
 
 ### Deployment Targets
 
-The app ships in three forms from the same codebase:
-1. **PWA** — `vite-plugin-pwa` with `autoUpdate` service worker, portrait orientation, Hebrew locale
-2. **iOS** — Capacitor wrapping the `dist/` build (`appId: com.pocketace.app`)
-3. **Android** — same Capacitor config, `androidScheme: https`
+The app ships as a **PWA** only — `vite-plugin-pwa` with `autoUpdate` service worker, portrait orientation, Hebrew locale — hosted on Firebase Hosting. There are no native iOS/Android builds.
 
 ### TypeScript
 
